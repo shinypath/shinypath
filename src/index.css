@@ -2,95 +2,140 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Shiny Path Cleaning Design System */
+
+@font-face {
+  font-family: 'Tenor Sans';
+  src: url('/fonts/TenorSans-Regular.woff2') format('woff2'),
+       url('/fonts/TenorSans-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ubuntu';
+  src: url('/fonts/Ubuntu-Regular.woff2') format('woff2'),
+       url('/fonts/Ubuntu-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ubuntu';
+  src: url('/fonts/Ubuntu-Medium.woff2') format('woff2'),
+       url('/fonts/Ubuntu-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ubuntu';
+  src: url('/fonts/Ubuntu-Bold.woff2') format('woff2'),
+       url('/fonts/Ubuntu-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Shiny Path Cleaning Color Palette */
+    --background: 220 20% 98%;
+    --foreground: 225 30% 25%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 225 30% 25%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 225 30% 25%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 225 45% 32%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 225 30% 25%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 225 45% 32%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 220 13% 85%;
+    --input: 220 13% 90%;
+    --ring: 225 45% 32%;
 
     --radius: 0.5rem;
 
+    /* Calculator specific */
+    --calculator-bg: 0 0% 100%;
+    --calculator-border: 220 13% 90%;
+    --price-color: 225 45% 32%;
+
+    /* Status colors */
+    --status-pending: 45 93% 47%;
+    --status-confirmed: 142 76% 36%;
+    --status-completed: 217 91% 60%;
+    --status-cancelled: 0 84% 60%;
+
+    /* Sidebar */
     --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-foreground: 220 9% 46%;
+    --sidebar-primary: 225 45% 32%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 96%;
+    --sidebar-accent-foreground: 225 30% 25%;
+    --sidebar-border: 220 13% 85%;
+    --sidebar-ring: 225 45% 32%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 225 30% 10%;
+    --foreground: 220 20% 98%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 225 30% 12%;
+    --card-foreground: 220 20% 98%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 225 30% 12%;
+    --popover-foreground: 220 20% 98%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 220 60% 60%;
+    --primary-foreground: 225 30% 10%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 225 25% 20%;
+    --secondary-foreground: 220 20% 98%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 225 25% 20%;
+    --muted-foreground: 220 9% 60%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 220 60% 60%;
+    --accent-foreground: 225 30% 10%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 225 25% 25%;
+    --input: 225 25% 25%;
+    --ring: 220 60% 60%;
+
+    --calculator-bg: 225 30% 12%;
+    --calculator-border: 225 25% 25%;
+    --price-color: 220 60% 60%;
+
+    --sidebar-background: 225 30% 10%;
+    --sidebar-foreground: 220 9% 60%;
+    --sidebar-primary: 220 60% 60%;
+    --sidebar-primary-foreground: 225 30% 10%;
+    --sidebar-accent: 225 25% 20%;
+    --sidebar-accent-foreground: 220 20% 98%;
+    --sidebar-border: 225 25% 25%;
+    --sidebar-ring: 220 60% 60%;
   }
 }
 
@@ -99,7 +144,59 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html, body {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
   body {
     @apply bg-background text-foreground;
+    font-family: 'Ubuntu', system-ui, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Tenor Sans', serif;
+  }
+}
+
+@layer components {
+  .heading-display {
+    font-family: 'Tenor Sans', serif;
+    @apply uppercase tracking-wide;
+  }
+
+  .price-display {
+    color: hsl(var(--price-color));
+    @apply font-bold;
+  }
+
+  .calculator-panel {
+    background: hsl(var(--calculator-bg));
+    border: 1px solid hsl(var(--calculator-border));
+    @apply rounded-lg p-4 shadow-sm;
+  }
+
+  .status-pending {
+    background: hsl(var(--status-pending) / 0.15);
+    color: hsl(var(--status-pending));
+    @apply font-medium;
+  }
+
+  .status-confirmed {
+    background: hsl(var(--status-confirmed) / 0.15);
+    color: hsl(var(--status-confirmed));
+    @apply font-medium;
+  }
+
+  .status-completed {
+    background: hsl(var(--status-completed) / 0.15);
+    color: hsl(var(--status-completed));
+    @apply font-medium;
+  }
+
+  .status-cancelled {
+    background: hsl(var(--status-cancelled) / 0.15);
+    color: hsl(var(--status-cancelled));
+    @apply font-medium;
   }
 }
