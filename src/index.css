@@ -164,6 +164,11 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Tenor Sans', serif;
     color: hsl(var(--title-color));
+    text-transform: uppercase;
+  }
+  
+  .font-tenor, .font-display {
+    text-transform: uppercase;
   }
 }
 
