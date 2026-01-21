@@ -6,7 +6,8 @@ import {
   DollarSign, 
   Settings,
   LogOut,
-  Sparkles
+  Sparkles,
+  ClipboardList
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -29,6 +30,7 @@ const menuItems = [
   { title: 'Dashboard', url: '/admin', icon: LayoutDashboard },
   { title: 'Submissions', url: '/admin/submissions', icon: FileText },
   { title: 'Calendar', url: '/admin/calendar', icon: Calendar },
+  { title: 'Forms', url: '/admin/forms', icon: ClipboardList },
   { title: 'Pricing', url: '/admin/pricing', icon: DollarSign },
   { title: 'Settings', url: '/admin/settings', icon: Settings },
 ];

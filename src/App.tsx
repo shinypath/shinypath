@@ -11,6 +11,7 @@ import AdminLayout from "./layouts/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import SubmissionsPage from "./pages/admin/SubmissionsPage";
 import CalendarPage from "./pages/admin/CalendarPage";
+import FormsPage from "./pages/admin/FormsPage";
 import PricingConfigPage from "./pages/admin/PricingConfigPage";
 import SettingsPage from "./pages/admin/SettingsPage";
 
@@ -34,6 +35,7 @@ const App = () => (
               <Route index element={<AdminDashboard />} />
               <Route path="submissions" element={<SubmissionsPage />} />
               <Route path="calendar" element={<CalendarPage />} />
+              <Route path="forms" element={<FormsPage />} />
               <Route path="pricing" element={<PricingConfigPage />} />
               <Route path="settings" element={<SettingsPage />} />
             </Route>
