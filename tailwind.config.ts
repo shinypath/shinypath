@@ -56,6 +56,7 @@ export default {
           border: "hsl(var(--calculator-border))",
         },
         price: "hsl(var(--price-color))",
+        title: "hsl(var(--title-color))",
         status: {
           pending: "hsl(var(--status-pending))",
           confirmed: "hsl(var(--status-confirmed))",

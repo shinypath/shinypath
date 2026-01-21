@@ -5,8 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Sparkles, Lock } from 'lucide-react';
+import { Lock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import shinyPathLogo from '@/assets/shiny-path-logo.svg';
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
@@ -43,13 +44,10 @@ export default function AdminLogin() {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Sparkles className="h-8 w-8 text-primary" />
-            <span className="font-tenor text-2xl font-bold text-primary tracking-wide">
-              SHINY PATH
-            </span>
+          <div className="flex items-center justify-center mb-4">
+            <img src={shinyPathLogo} alt="Shiny Path" className="h-10" />
           </div>
-          <CardTitle className="text-xl">Admin Login</CardTitle>
+          <CardTitle className="text-xl text-title">Admin Login</CardTitle>
           <CardDescription>
             Sign in to access the admin dashboard
           </CardDescription>
