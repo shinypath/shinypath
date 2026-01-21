@@ -1,9 +1,12 @@
+// Icon color: #283D8F (Navy blue from pets icon)
+const ICON_COLOR = "#283D8F";
+
 export function FridgeIcon({ className }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 24 24"
       fill="none"
-      stroke="currentColor"
+      stroke={ICON_COLOR}
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -22,7 +25,7 @@ export function OvenIcon({ className }: { className?: string }) {
     <svg
       viewBox="0 0 24 24"
       fill="none"
-      stroke="currentColor"
+      stroke={ICON_COLOR}
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -42,7 +45,7 @@ export function CabinetsIcon({ className }: { className?: string }) {
     <svg
       viewBox="0 0 24 24"
       fill="none"
-      stroke="currentColor"
+      stroke={ICON_COLOR}
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -61,7 +64,7 @@ export function DishesIcon({ className }: { className?: string }) {
     <svg
       viewBox="0 0 24 24"
       fill="none"
-      stroke="currentColor"
+      stroke={ICON_COLOR}
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -79,20 +82,35 @@ export function DishesIcon({ className }: { className?: string }) {
 export function PetsIcon({ className }: { className?: string }) {
   return (
     <svg
-      viewBox="0 0 24 24"
+      viewBox="0 0 47 47"
       fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
       className={className}
     >
-      <circle cx="11" cy="4" r="2" />
-      <circle cx="18" cy="8" r="2" />
-      <circle cx="4" cy="8" r="2" />
-      <circle cx="8" cy="15" r="2" />
-      <circle cx="14" cy="15" r="2" />
-      <path d="M7 15c0 2.5 2 5 5 5s5-2.5 5-5" />
+      <g clipPath="url(#pets-clip)">
+        <path
+          stroke={ICON_COLOR}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M23.385 35.078v4.385m2.923-7.307-2.923 2.923-2.923-2.923M19 8.77h8.77m-8.77 0L9.204 5.891a1.462 1.462 0 0 0-1.79 1.15l-3 16.076C4.13 24.622 6.057 25.492 7 24.29L19 8.77Zm8.77 0 9.798-2.879a1.462 1.462 0 0 1 1.79 1.15l3 16.076c.281 1.504-1.644 2.375-2.587 1.173L27.769 8.77Z"
+        />
+        <path
+          fill={ICON_COLOR}
+          d="M16.808 27.771a2.192 2.192 0 1 0 0-4.384 2.192 2.192 0 0 0 0 4.384Zm13.154 0a2.192 2.192 0 1 0 0-4.384 2.192 2.192 0 0 0 0 4.384Z"
+        />
+        <path
+          stroke={ICON_COLOR}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M38 21.996V33.62a5.847 5.847 0 0 1-5.846 5.846H14.616A5.846 5.846 0 0 1 8.77 33.62V21.996"
+        />
+      </g>
+      <defs>
+        <clipPath id="pets-clip">
+          <path fill="#fff" d="M0 0h46.77v46.77H0z" />
+        </clipPath>
+      </defs>
     </svg>
   );
 }
