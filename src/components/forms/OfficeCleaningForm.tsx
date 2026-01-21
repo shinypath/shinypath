@@ -120,7 +120,7 @@ export function OfficeCleaningForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="animate-fade-in max-w-2xl">
+    <form onSubmit={handleSubmit} className="animate-fade-in max-w-2xl mx-auto bg-card rounded-lg border p-6">
       <div className="bg-card rounded-lg border p-6 mb-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="p-2 bg-primary/10 rounded-lg">

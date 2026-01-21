@@ -195,7 +195,7 @@ export function HouseCleaningForm() {
     <form onSubmit={handleSubmit} className="animate-fade-in">
       <div className="grid lg:grid-cols-[1fr,320px] gap-8">
         {/* Form Fields */}
-        <div className="space-y-6">
+        <div className="space-y-6 bg-card rounded-lg border p-6">
           {/* Type of Cleaning */}
           <div className="space-y-2">
             <FormLabel required>Type of Cleaning</FormLabel>
