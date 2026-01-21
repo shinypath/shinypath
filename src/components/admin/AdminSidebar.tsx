@@ -6,7 +6,6 @@ import {
   DollarSign, 
   Settings,
   LogOut,
-  Sparkles,
   ClipboardList
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -25,6 +24,7 @@ import {
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import shinyPathLogo from '@/assets/shiny-path-logo.svg';
 
 const menuItems = [
   { title: 'Dashboard', url: '/admin', icon: LayoutDashboard },
@@ -42,21 +42,22 @@ export function AdminSidebar() {
   const collapsed = state === 'collapsed';
 
   return (
-    <Sidebar collapsible="icon">
-      <SidebarHeader className="border-b border-border p-4">
+    <Sidebar collapsible="icon" className="!bg-sidebar !border-sidebar-border">
+      <SidebarHeader className="border-b border-sidebar-border p-4">
         <div className="flex items-center gap-2">
-          <Sparkles className="h-6 w-6 text-primary shrink-0" />
-          {!collapsed && (
-            <span className="font-tenor text-lg font-bold text-primary tracking-wide">
-              SHINY PATH
-            </span>
+          {!collapsed ? (
+            <img src={shinyPathLogo} alt="Shiny Path" className="h-8 brightness-0 invert" />
+          ) : (
+            <div className="h-6 w-6 rounded-full bg-white/20 flex items-center justify-center">
+              <span className="text-white font-bold text-xs">SP</span>
+            </div>
           )}
         </div>
       </SidebarHeader>
       
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Menu</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-white/70">Menu</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => {
@@ -69,12 +70,12 @@ export function AdminSidebar() {
                       <NavLink 
                         to={item.url} 
                         className={cn(
-                          "flex items-center gap-3",
-                          isActive && "bg-primary/10 text-primary"
+                          "flex items-center gap-3 text-white/90 hover:text-white hover:bg-white/10",
+                          isActive && "bg-white/20 text-white"
                         )}
                       >
                         <item.icon className="h-4 w-4" />
-                        <span>{item.title}</span>
+                        <span className="font-sans">{item.title}</span>
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -85,14 +86,14 @@ export function AdminSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-border p-4">
+      <SidebarFooter className="border-t border-sidebar-border p-4">
         <Button 
           variant="ghost" 
-          className="w-full justify-start gap-3" 
+          className="w-full justify-start gap-3 text-white/90 hover:text-white hover:bg-white/10" 
           onClick={signOut}
         >
           <LogOut className="h-4 w-4" />
-          {!collapsed && <span>Sign Out</span>}
+          {!collapsed && <span className="font-sans">Sign Out</span>}
         </Button>
       </SidebarFooter>
     </Sidebar>

@@ -132,9 +132,9 @@ export function Summary({
         )}
 
         {/* Total */}
-        <div className="flex justify-between text-xl font-bold text-primary pt-2 border-t border-border">
+        <div className="flex justify-between text-xl font-bold text-primary pt-2 border-t border-border font-display">
           <span>Total</span>
-          <span className="price-display">{formatCurrency(calculation.total)}</span>
+          <span className="price-display font-display">{formatCurrency(calculation.total)}</span>
         </div>
       </div>
     </div>
