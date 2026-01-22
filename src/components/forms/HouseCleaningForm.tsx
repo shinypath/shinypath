@@ -11,7 +11,7 @@ import { Summary } from "./Summary";
 import { FridgeIcon, OvenIcon, CabinetsIcon, DishesIcon, PetsIcon } from "../icons/CleaningIcons";
 import { useCalculator } from "@/hooks/useCalculator";
 import { getPricing, formatCurrency } from "@/lib/pricing";
-import { saveQuote } from "@/lib/storage";
+import { useQuotes } from "@/hooks/useQuotes";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
@@ -62,6 +62,7 @@ const TIME_SLOTS = [
 export function HouseCleaningForm() {
   const { toast } = useToast();
   const pricing = getPricing();
+  const { createQuote } = useQuotes();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -167,7 +168,7 @@ export function HouseCleaningForm() {
     setIsSubmitting(true);
 
     try {
-      saveQuote({
+      await createQuote({
         form_type: "house",
         cleaning_type: formData.cleaningType,
         frequency: formData.frequency,

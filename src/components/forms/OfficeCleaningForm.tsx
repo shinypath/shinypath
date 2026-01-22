@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FormLabel } from "./FormLabel";
 import { FormInput } from "./FormInput";
 import { FormTextarea } from "./FormTextarea";
-import { saveQuote } from "@/lib/storage";
+import { useQuotes } from "@/hooks/useQuotes";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Loader2, Building2 } from "lucide-react";
@@ -14,6 +14,7 @@ interface Errors {
 
 export function OfficeCleaningForm() {
   const { toast } = useToast();
+  const { createQuote } = useQuotes();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
 
@@ -71,7 +72,7 @@ export function OfficeCleaningForm() {
     setIsSubmitting(true);
 
     try {
-      saveQuote({
+      await createQuote({
         form_type: "office",
         cleaning_type: "office",
         frequency: "custom",
