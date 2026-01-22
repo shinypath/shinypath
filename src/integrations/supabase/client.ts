@@ -3,6 +3,13 @@ import { createClient } from '@supabase/supabase-js';
 const STORAGE_URL_KEY = 'shiny-path:supabase_url';
 const STORAGE_ANON_KEY = 'shiny-path:supabase_anon_key';
 
+// Public defaults (safe to ship). This prevents the app from ever blocking on a
+// setup screen just because Vite env vars aren't injected in a given preview
+// origin.
+const DEFAULT_SUPABASE_URL = 'https://qiuylxlpczlcmvnmaecm.supabase.co';
+const DEFAULT_SUPABASE_ANON_KEY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpdXlseGxwY3psY212bm1hZWNtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkwMzI4NDAsImV4cCI6MjA4NDYwODg0MH0.cHLRtTTnGKonfWc3ye5jUgPBaeQLy4L34y7jscYbrqk';
+
 function readConfig() {
   // In Vite, import.meta.env variables are compile-time replacements.
   // If they are not set for the frontend build, we fall back to localStorage.
@@ -12,8 +19,9 @@ function readConfig() {
   const storedUrl = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_URL_KEY) ?? undefined : undefined;
   const storedAnon = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_ANON_KEY) ?? undefined : undefined;
 
-  const url = envUrl || storedUrl;
-  const anonKey = envAnon || storedAnon;
+  // Priority: Vite env → localStorage (user override) → safe defaults
+  const url = envUrl || storedUrl || DEFAULT_SUPABASE_URL;
+  const anonKey = envAnon || storedAnon || DEFAULT_SUPABASE_ANON_KEY;
 
   return { url, anonKey };
 }
