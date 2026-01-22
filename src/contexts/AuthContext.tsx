@@ -1,41 +1,44 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { checkAdminSession, setAdminSession, DEMO_ADMIN } from '@/lib/storage';
+import React, { createContext, useContext, ReactNode } from 'react';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
+import { User, Session } from '@supabase/supabase-js';
 
 interface AuthContextType {
+  user: User | null;
+  session: Session | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  signIn: (email: string, password: string) => Promise<boolean>;
-  signOut: () => void;
+  isAdmin: boolean;
+  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string) => Promise<{ error: any }>;
+  signOut: () => Promise<{ error: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const {
+    user,
+    session,
+    loading,
+    isAdmin,
+    signIn,
+    signUp,
+    signOut,
+  } = useSupabaseAuth();
 
-  useEffect(() => {
-    const authenticated = checkAdminSession();
-    setIsAuthenticated(authenticated);
-    setIsLoading(false);
-  }, []);
-
-  const signIn = async (email: string, password: string): Promise<boolean> => {
-    if (email === DEMO_ADMIN.email && password === DEMO_ADMIN.password) {
-      setAdminSession(true);
-      setIsAuthenticated(true);
-      return true;
-    }
-    return false;
-  };
-
-  const signOut = () => {
-    setAdminSession(false);
-    setIsAuthenticated(false);
-  };
+  const isAuthenticated = !!user && !!session;
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, isLoading, signIn, signOut }}>
+    <AuthContext.Provider value={{ 
+      user,
+      session,
+      isAuthenticated, 
+      isLoading: loading, 
+      isAdmin,
+      signIn, 
+      signUp,
+      signOut 
+    }}>
       {children}
     </AuthContext.Provider>
   );
