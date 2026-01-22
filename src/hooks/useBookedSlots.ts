@@ -6,6 +6,11 @@ export interface BookedSlot {
   time: string; // HH:MM
 }
 
+// Total available slots per day (8:00 AM to 6:00 PM = 11 slots)
+export const TOTAL_DAILY_SLOTS = 11;
+
+export type DateAvailability = 'available' | 'limited' | 'full';
+
 /**
  * Fetches booked date/time slots from cleaning_quotes
  * Excludes cancelled quotes so those slots become available again
@@ -59,21 +64,48 @@ export function useBookedSlots() {
   }, [bookedSlots]);
 
   /**
-   * Check if a date has any available slots (assuming business hours 8am-6pm)
+   * Get count of booked slots for a date
+   */
+  const getBookedCountForDate = useCallback((date: string): number => {
+    return getBookedTimesForDate(date).length;
+  }, [getBookedTimesForDate]);
+
+  /**
+   * Check if a date has any available slots
    */
   const isDateFullyBooked = useCallback((date: string): boolean => {
-    const bookedTimes = getBookedTimesForDate(date);
-    // Business hours: 8:00 to 18:00 (11 slots)
-    const totalSlots = 11;
-    return bookedTimes.length >= totalSlots;
-  }, [getBookedTimesForDate]);
+    return getBookedCountForDate(date) >= TOTAL_DAILY_SLOTS;
+  }, [getBookedCountForDate]);
+
+  /**
+   * Get availability status for a date
+   * - 'available': 0-3 slots booked (8+ available)
+   * - 'limited': 4-10 slots booked (1-7 available)  
+   * - 'full': 11 slots booked (0 available)
+   */
+  const getDateAvailability = useCallback((date: string): DateAvailability => {
+    const bookedCount = getBookedCountForDate(date);
+    if (bookedCount >= TOTAL_DAILY_SLOTS) return 'full';
+    if (bookedCount >= 4) return 'limited';
+    return 'available';
+  }, [getBookedCountForDate]);
+
+  /**
+   * Get available slots count for a date
+   */
+  const getAvailableSlotsCount = useCallback((date: string): number => {
+    return Math.max(0, TOTAL_DAILY_SLOTS - getBookedCountForDate(date));
+  }, [getBookedCountForDate]);
 
   return {
     bookedSlots,
     loading,
     isSlotBooked,
     getBookedTimesForDate,
+    getBookedCountForDate,
     isDateFullyBooked,
+    getDateAvailability,
+    getAvailableSlotsCount,
     refresh: fetchBookedSlots,
   };
 }
