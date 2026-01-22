@@ -14,6 +14,7 @@ import CalendarPage from "./pages/admin/CalendarPage";
 import FormsPage from "./pages/admin/FormsPage";
 import PricingConfigPage from "./pages/admin/PricingConfigPage";
 import SettingsPage from "./pages/admin/SettingsPage";
+import EmailSettingsPage from "./pages/admin/EmailSettingsPage";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,7 @@ const App = () => (
               <Route path="calendar" element={<CalendarPage />} />
               <Route path="forms" element={<FormsPage />} />
               <Route path="pricing" element={<PricingConfigPage />} />
+              <Route path="emails" element={<EmailSettingsPage />} />
               <Route path="settings" element={<SettingsPage />} />
             </Route>
             
