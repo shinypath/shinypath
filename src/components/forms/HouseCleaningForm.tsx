@@ -1,4 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
 import { FormLabel } from "./FormLabel";
 import { FormInput } from "./FormInput";
 import { FormSelect } from "./FormSelect";
@@ -14,7 +16,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import type { HouseCleaningFormData } from "@/lib/types";
-import { useBookedSlots } from "@/hooks/useBookedSlots";
+import { useBookedSlots, type DateAvailability } from "@/hooks/useBookedSlots";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 const BATHROOM_OPTIONS = [
   "0", "1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5", "5.5", "6", "6.5", "7", "7.5", "8"
@@ -59,7 +64,8 @@ export function HouseCleaningForm() {
   const pricing = getPricing();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
-  const { getBookedTimesForDate, isDateFullyBooked, loading: loadingSlots } = useBookedSlots();
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const { getBookedTimesForDate, isDateFullyBooked, getDateAvailability, getAvailableSlotsCount, loading: loadingSlots } = useBookedSlots();
   
   const [formData, setFormData] = useState<HouseCleaningFormData>({
     cleaningType: "standard",
@@ -350,20 +356,94 @@ export function HouseCleaningForm() {
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <FormLabel required>Preferred Date</FormLabel>
-              <FormInput
-                type="date"
-                value={formData.date}
-                onChange={e => {
-                  updateField("date", e.target.value);
-                  // Clear time if date changes (to force re-selection with available slots)
-                  updateField("time", "");
-                }}
-                error={errors.date}
-                min={new Date().toISOString().split("T")[0]}
-              />
-              {formData.date && isDateFullyBooked(formData.date) && (
-                <p className="text-xs text-destructive">
-                  All slots are booked for this date. Please select another date.
+              <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal h-10",
+                      !formData.date && "text-muted-foreground",
+                      errors.date && "border-destructive"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {formData.date ? format(new Date(formData.date + "T12:00:00"), "PPP") : "Pick a date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <div className="p-3 border-b">
+                    <div className="flex items-center gap-4 text-xs">
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                        <span>Available</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-3 h-3 rounded-full bg-amber-500" />
+                        <span>Limited</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-3 h-3 rounded-full bg-destructive" />
+                        <span>Full</span>
+                      </div>
+                    </div>
+                  </div>
+                  <Calendar
+                    mode="single"
+                    selected={formData.date ? new Date(formData.date + "T12:00:00") : undefined}
+                    onSelect={(date) => {
+                      if (date) {
+                        const dateStr = format(date, "yyyy-MM-dd");
+                        updateField("date", dateStr);
+                        updateField("time", ""); // Clear time to force re-selection
+                      }
+                      setCalendarOpen(false);
+                    }}
+                    disabled={(date) => {
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      if (date < today) return true;
+                      const dateStr = format(date, "yyyy-MM-dd");
+                      return isDateFullyBooked(dateStr);
+                    }}
+                    modifiers={{
+                      available: (date) => {
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        if (date < today) return false;
+                        const dateStr = format(date, "yyyy-MM-dd");
+                        return getDateAvailability(dateStr) === 'available';
+                      },
+                      limited: (date) => {
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        if (date < today) return false;
+                        const dateStr = format(date, "yyyy-MM-dd");
+                        return getDateAvailability(dateStr) === 'limited';
+                      },
+                      full: (date) => {
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        if (date < today) return false;
+                        const dateStr = format(date, "yyyy-MM-dd");
+                        return getDateAvailability(dateStr) === 'full';
+                      },
+                    }}
+                    modifiersClassNames={{
+                      available: "!bg-emerald-500/20 hover:!bg-emerald-500/30 !text-emerald-700 dark:!text-emerald-300",
+                      limited: "!bg-amber-500/20 hover:!bg-amber-500/30 !text-amber-700 dark:!text-amber-300",
+                      full: "!bg-destructive/20 !text-destructive !opacity-50 !cursor-not-allowed",
+                    }}
+                    className="p-3 pointer-events-auto"
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              {errors.date && (
+                <p className="text-xs text-destructive">{errors.date}</p>
+              )}
+              {formData.date && (
+                <p className="text-xs text-muted-foreground">
+                  {getAvailableSlotsCount(formData.date)} time slots available
                 </p>
               )}
             </div>
