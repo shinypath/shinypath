@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { FormLabel } from "./FormLabel";
 import { FormInput } from "./FormInput";
 import { FormSelect } from "./FormSelect";
@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import type { HouseCleaningFormData } from "@/lib/types";
+import { useBookedSlots } from "@/hooks/useBookedSlots";
 
 const BATHROOM_OPTIONS = [
   "0", "1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5", "5.5", "6", "6.5", "7", "7.5", "8"
@@ -38,11 +39,27 @@ interface Errors {
   [key: string]: string;
 }
 
+// Business hours time slots (8:00 AM to 6:00 PM)
+const TIME_SLOTS = [
+  { value: "08:00", label: "8:00 AM" },
+  { value: "09:00", label: "9:00 AM" },
+  { value: "10:00", label: "10:00 AM" },
+  { value: "11:00", label: "11:00 AM" },
+  { value: "12:00", label: "12:00 PM" },
+  { value: "13:00", label: "1:00 PM" },
+  { value: "14:00", label: "2:00 PM" },
+  { value: "15:00", label: "3:00 PM" },
+  { value: "16:00", label: "4:00 PM" },
+  { value: "17:00", label: "5:00 PM" },
+  { value: "18:00", label: "6:00 PM" },
+];
+
 export function HouseCleaningForm() {
   const { toast } = useToast();
   const pricing = getPricing();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
+  const { getBookedTimesForDate, isDateFullyBooked, loading: loadingSlots } = useBookedSlots();
   
   const [formData, setFormData] = useState<HouseCleaningFormData>({
     cleaningType: "standard",
@@ -61,6 +78,14 @@ export function HouseCleaningForm() {
     phone: "",
     details: "",
   });
+
+  // Get available time slots for the selected date
+  const availableTimeSlots = useMemo(() => {
+    if (!formData.date) return TIME_SLOTS;
+    
+    const bookedTimes = getBookedTimesForDate(formData.date);
+    return TIME_SLOTS.filter(slot => !bookedTimes.includes(slot.value));
+  }, [formData.date, getBookedTimesForDate]);
 
   const calculation = useCalculator({
     cleaningType: formData.cleaningType,
@@ -328,19 +353,48 @@ export function HouseCleaningForm() {
               <FormInput
                 type="date"
                 value={formData.date}
-                onChange={e => updateField("date", e.target.value)}
+                onChange={e => {
+                  updateField("date", e.target.value);
+                  // Clear time if date changes (to force re-selection with available slots)
+                  updateField("time", "");
+                }}
                 error={errors.date}
                 min={new Date().toISOString().split("T")[0]}
               />
+              {formData.date && isDateFullyBooked(formData.date) && (
+                <p className="text-xs text-destructive">
+                  All slots are booked for this date. Please select another date.
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <FormLabel required>Preferred Time</FormLabel>
-              <FormInput
-                type="time"
-                value={formData.time}
-                onChange={e => updateField("time", e.target.value)}
-                error={errors.time}
-              />
+              {loadingSlots ? (
+                <div className="flex items-center h-10 px-3 border rounded-md bg-muted/50 text-muted-foreground text-sm">
+                  Loading available times...
+                </div>
+              ) : !formData.date ? (
+                <div className="flex items-center h-10 px-3 border rounded-md bg-muted/50 text-muted-foreground text-sm">
+                  Select a date first
+                </div>
+              ) : availableTimeSlots.length === 0 ? (
+                <div className="flex items-center h-10 px-3 border rounded-md bg-destructive/10 text-destructive text-sm">
+                  No available times for this date
+                </div>
+              ) : (
+                <FormSelect
+                  value={formData.time}
+                  onChange={e => updateField("time", e.target.value)}
+                  options={[
+                    { value: "", label: "Select a time" },
+                    ...availableTimeSlots,
+                  ]}
+                  error={errors.time}
+                />
+              )}
+              {errors.time && formData.date && availableTimeSlots.length > 0 && (
+                <p className="text-xs text-destructive">{errors.time}</p>
+              )}
             </div>
           </div>
 
