@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { QuoteStatus, CleaningQuote, CleaningFormType } from '@/lib/types';
+import { sendNotificationEmail, type NotificationType } from './useEmailSettings';
 
 export interface QuoteInsert {
   form_type: string;
@@ -24,6 +25,12 @@ export interface QuoteInsert {
   total?: number;
   status?: string;
 }
+
+// Map status changes to notification types
+const statusToNotificationType: Partial<Record<QuoteStatus, NotificationType>> = {
+  confirmed: 'appointment_confirmed',
+  cancelled: 'appointment_cancelled',
+};
 
 export function useQuotes() {
   const [quotes, setQuotes] = useState<CleaningQuote[]>([]);
@@ -90,6 +97,17 @@ export function useQuotes() {
       throw new Error(insertError.message);
     }
 
+    // Send notification emails for new booking (non-blocking)
+    if (data?.id) {
+      sendNotificationEmail(data.id, 'appointment_created', true, true)
+        .then(result => {
+          if (!result.success) {
+            console.warn('Failed to send appointment_created email:', result.error);
+          }
+        })
+        .catch(err => console.warn('Email notification error:', err));
+    }
+
     await fetchQuotes();
     return data as CleaningQuote;
   };
@@ -104,6 +122,18 @@ export function useQuotes() {
 
     if (updateError) {
       throw new Error(updateError.message);
+    }
+
+    // Send notification email for status change (non-blocking)
+    const notificationType = statusToNotificationType[status];
+    if (notificationType && data?.id) {
+      sendNotificationEmail(data.id, notificationType, true, false)
+        .then(result => {
+          if (!result.success) {
+            console.warn(`Failed to send ${notificationType} email:`, result.error);
+          }
+        })
+        .catch(err => console.warn('Email notification error:', err));
     }
 
     await fetchQuotes();
