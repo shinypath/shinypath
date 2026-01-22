@@ -26,7 +26,7 @@ import { Search, Filter, RefreshCw, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function SubmissionsPage() {
-  const { quotes, loading, fetchQuotes } = useQuotes();
+  const { quotes, loading, fetchQuotes, updateQuoteStatus, deleteQuote } = useQuotes();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<QuoteStatus | 'all'>('all');
   const [typeFilter, setTypeFilter] = useState<CleaningFormType | 'all'>('all');
@@ -196,6 +196,8 @@ export default function SubmissionsPage() {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         onUpdate={refreshQuotes}
+        onStatusChange={updateQuoteStatus}
+        onDelete={deleteQuote}
       />
     </div>
   );

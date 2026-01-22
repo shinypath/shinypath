@@ -1,6 +1,6 @@
+import { useState } from 'react';
 import { CleaningQuote, QuoteStatus } from '@/lib/types';
 import { formatCurrency } from '@/lib/pricing';
-import { updateQuoteStatus, deleteQuote } from '@/lib/storage';
 import {
   Dialog,
   DialogContent,
@@ -31,7 +31,8 @@ import {
   XCircle,
   RotateCcw,
   Trash2,
-  MessageSquare
+  MessageSquare,
+  Loader2
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -40,25 +41,46 @@ interface BookingDetailsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onUpdate: () => void;
+  onStatusChange: (id: string, status: QuoteStatus) => Promise<CleaningQuote | null>;
+  onDelete: (id: string) => Promise<boolean>;
 }
 
 export function BookingDetailsDialog({ 
   booking, 
   open, 
   onOpenChange,
-  onUpdate 
+  onUpdate,
+  onStatusChange,
+  onDelete
 }: BookingDetailsDialogProps) {
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   if (!booking) return null;
 
-  const handleStatusChange = (status: QuoteStatus) => {
-    updateQuoteStatus(booking.id, status);
-    onUpdate();
+  const handleStatusChange = async (status: QuoteStatus) => {
+    setIsUpdating(true);
+    try {
+      await onStatusChange(booking.id, status);
+      onUpdate();
+    } catch (error) {
+      console.error('Error updating status:', error);
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
-  const handleDelete = () => {
-    deleteQuote(booking.id);
-    onOpenChange(false);
-    onUpdate();
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await onDelete(booking.id);
+      onOpenChange(false);
+      onUpdate();
+    } catch (error) {
+      console.error('Error deleting booking:', error);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const statusColors: Record<QuoteStatus, string> = {
@@ -223,8 +245,9 @@ export function BookingDetailsDialog({
                 <Button 
                   variant="default" 
                   onClick={() => handleStatusChange('confirmed')}
+                  disabled={isUpdating}
                 >
-                  <CheckCircle className="h-4 w-4 mr-2" />
+                  {isUpdating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CheckCircle className="h-4 w-4 mr-2" />}
                   Confirm
                 </Button>
               )}
@@ -232,8 +255,9 @@ export function BookingDetailsDialog({
                 <Button 
                   variant="default"
                   onClick={() => handleStatusChange('completed')}
+                  disabled={isUpdating}
                 >
-                  <CheckCircle className="h-4 w-4 mr-2" />
+                  {isUpdating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CheckCircle className="h-4 w-4 mr-2" />}
                   Mark Completed
                 </Button>
               )}
@@ -241,8 +265,9 @@ export function BookingDetailsDialog({
                 <Button 
                   variant="outline" 
                   onClick={() => handleStatusChange('cancelled')}
+                  disabled={isUpdating}
                 >
-                  <XCircle className="h-4 w-4 mr-2" />
+                  {isUpdating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <XCircle className="h-4 w-4 mr-2" />}
                   Cancel
                 </Button>
               )}
@@ -250,16 +275,17 @@ export function BookingDetailsDialog({
                 <Button 
                   variant="outline" 
                   onClick={() => handleStatusChange('pending')}
+                  disabled={isUpdating}
                 >
-                  <RotateCcw className="h-4 w-4 mr-2" />
+                  {isUpdating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <RotateCcw className="h-4 w-4 mr-2" />}
                   Reactivate
                 </Button>
               )}
               
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="destructive">
-                    <Trash2 className="h-4 w-4 mr-2" />
+                  <Button variant="destructive" disabled={isDeleting}>
+                    {isDeleting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Trash2 className="h-4 w-4 mr-2" />}
                     Delete
                   </Button>
                 </AlertDialogTrigger>

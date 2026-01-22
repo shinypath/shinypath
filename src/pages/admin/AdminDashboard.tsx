@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getQuotes } from '@/lib/storage';
+import { useQuotes } from '@/hooks/useQuotes';
 import { formatCurrency } from '@/lib/pricing';
 import { 
   CalendarDays, 
@@ -8,12 +8,13 @@ import {
   CheckCircle, 
   DollarSign,
   TrendingUp,
-  Users
+  Users,
+  Loader2
 } from 'lucide-react';
-import { format, isToday, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
+import { isToday, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 
 export default function AdminDashboard() {
-  const quotes = getQuotes();
+  const { quotes, loading } = useQuotes();
 
   const stats = useMemo(() => {
     const now = new Date();
@@ -96,6 +97,14 @@ export default function AdminDashboard() {
       color: 'text-primary' 
     },
   ];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
