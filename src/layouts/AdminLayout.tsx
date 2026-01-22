@@ -6,12 +6,12 @@ import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AdminLayout() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, isAdmin } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      navigate('/admin/login');
+      navigate('/auth');
     }
   }, [isAuthenticated, isLoading, navigate]);
 
