@@ -86,28 +86,25 @@ export function BookingDetailsDialog({
             <h3 className="font-tenor text-lg tracking-wide mb-3">Client Information</h3>
             <div className="bg-muted/50 rounded-lg p-4 space-y-3">
               <p className="font-medium text-lg">{booking.client_name}</p>
-              {booking.company && (
-                <p className="text-muted-foreground">{booking.company}</p>
-              )}
               <div className="flex flex-wrap gap-4">
                 <a 
-                  href={`mailto:${booking.email}`}
+                  href={`mailto:${booking.client_email}`}
                   className="flex items-center gap-2 text-primary hover:underline"
                 >
                   <Mail className="h-4 w-4" />
-                  {booking.email}
+                  {booking.client_email}
                 </a>
                 <a 
-                  href={`tel:${booking.phone}`}
+                  href={`tel:${booking.client_phone}`}
                   className="flex items-center gap-2 text-primary hover:underline"
                 >
                   <Phone className="h-4 w-4" />
-                  {booking.phone}
+                  {booking.client_phone}
                 </a>
               </div>
               <div className="flex items-start gap-2 text-muted-foreground">
                 <MapPin className="h-4 w-4 mt-0.5" />
-                {booking.address}
+                {booking.client_address}
               </div>
             </div>
           </div>
@@ -115,19 +112,19 @@ export function BookingDetailsDialog({
           {/* Quick Actions */}
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" asChild>
-              <a href={`mailto:${booking.email}`}>
+              <a href={`mailto:${booking.client_email}`}>
                 <Mail className="h-4 w-4 mr-2" />
                 Email
               </a>
             </Button>
             <Button variant="outline" size="sm" asChild>
-              <a href={`sms:${booking.phone}`}>
+              <a href={`sms:${booking.client_phone}`}>
                 <MessageSquare className="h-4 w-4 mr-2" />
                 SMS
               </a>
             </Button>
             <Button variant="outline" size="sm" asChild>
-              <a href={`tel:${booking.phone}`}>
+              <a href={`tel:${booking.client_phone}`}>
                 <Phone className="h-4 w-4 mr-2" />
                 Call
               </a>
@@ -146,7 +143,7 @@ export function BookingDetailsDialog({
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-muted-foreground" />
-                <span>{booking.preferred_time}</span>
+                <span>{booking.preferred_time || 'Not specified'}</span>
               </div>
             </div>
             
@@ -173,20 +170,20 @@ export function BookingDetailsDialog({
                       <span>{booking.extras.join(', ')}</span>
                     </div>
                   )}
-                  {booking.laundry > 0 && (
+                  {booking.laundry_persons > 0 && (
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Laundry:</span>
-                      <span>{booking.laundry} person(s)</span>
+                      <span>{booking.laundry_persons} person(s)</span>
                     </div>
                   )}
                 </>
               )}
             </div>
 
-            {booking.additional_details && (
+            {booking.details && (
               <div className="mt-4 p-3 bg-muted rounded-lg">
                 <p className="text-sm text-muted-foreground">Additional Notes:</p>
-                <p className="mt-1">{booking.additional_details}</p>
+                <p className="mt-1">{booking.details}</p>
               </div>
             )}
           </div>

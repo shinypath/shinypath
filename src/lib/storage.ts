@@ -16,11 +16,53 @@ export function getQuotes(): CleaningQuote[] {
   return [];
 }
 
-export function saveQuote(quote: Omit<CleaningQuote, 'id' | 'created_at' | 'updated_at'>): CleaningQuote {
+export interface SaveQuoteInput {
+  form_type: string;
+  cleaning_type: string;
+  frequency: string;
+  kitchens?: number;
+  bathrooms?: string;
+  bedrooms?: string;
+  living_rooms?: number;
+  extras?: string[];
+  laundry_persons?: number;
+  preferred_date: string;
+  preferred_time?: string;
+  client_address: string;
+  client_name: string;
+  client_email: string;
+  client_phone: string;
+  details?: string;
+  subtotal?: number;
+  discount?: number;
+  total?: number;
+  status?: string;
+}
+
+export function saveQuote(quote: SaveQuoteInput): CleaningQuote {
   const quotes = getQuotes();
   const newQuote: CleaningQuote = {
-    ...quote,
     id: crypto.randomUUID(),
+    form_type: quote.form_type as CleaningQuote['form_type'],
+    cleaning_type: quote.cleaning_type,
+    frequency: quote.frequency,
+    kitchens: quote.kitchens ?? 0,
+    bathrooms: quote.bathrooms ?? '0',
+    bedrooms: quote.bedrooms ?? '0',
+    living_rooms: quote.living_rooms ?? 0,
+    extras: quote.extras ?? [],
+    laundry_persons: quote.laundry_persons ?? 0,
+    preferred_date: quote.preferred_date,
+    preferred_time: quote.preferred_time ?? null,
+    client_address: quote.client_address,
+    client_name: quote.client_name,
+    client_email: quote.client_email,
+    client_phone: quote.client_phone,
+    details: quote.details ?? null,
+    subtotal: quote.subtotal ?? 0,
+    discount: quote.discount ?? 0,
+    total: quote.total ?? 0,
+    status: (quote.status ?? 'pending') as QuoteStatus,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };
