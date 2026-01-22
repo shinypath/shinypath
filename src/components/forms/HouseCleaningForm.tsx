@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Clock } from "lucide-react";
 import { FormLabel } from "./FormLabel";
 import { FormInput } from "./FormInput";
 import { FormSelect } from "./FormSelect";
@@ -65,6 +65,7 @@ export function HouseCleaningForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const [timeOpen, setTimeOpen] = useState(false);
   const { getBookedTimesForDate, isDateFullyBooked, getDateAvailability, getAvailableSlotsCount, loading: loadingSlots } = useBookedSlots();
   
   const [formData, setFormData] = useState<HouseCleaningFormData>({
@@ -84,6 +85,12 @@ export function HouseCleaningForm() {
     phone: "",
     details: "",
   });
+
+  // Get booked times for visual feedback
+  const bookedTimesForDate = useMemo(() => {
+    if (!formData.date) return new Set<string>();
+    return new Set(getBookedTimesForDate(formData.date));
+  }, [formData.date, getBookedTimesForDate]);
 
   // Get available time slots for the selected date
   const availableTimeSlots = useMemo(() => {
@@ -457,22 +464,68 @@ export function HouseCleaningForm() {
                 <div className="flex items-center h-10 px-3 border rounded-md bg-muted/50 text-muted-foreground text-sm">
                   Select a date first
                 </div>
-              ) : availableTimeSlots.length === 0 ? (
-                <div className="flex items-center h-10 px-3 border rounded-md bg-destructive/10 text-destructive text-sm">
-                  No available times for this date
-                </div>
               ) : (
-                <FormSelect
-                  value={formData.time}
-                  onChange={e => updateField("time", e.target.value)}
-                  options={[
-                    { value: "", label: "Select a time" },
-                    ...availableTimeSlots,
-                  ]}
-                  error={errors.time}
-                />
+                <Popover open={timeOpen} onOpenChange={setTimeOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal h-10",
+                        !formData.time && "text-muted-foreground",
+                        errors.time && "border-destructive"
+                      )}
+                    >
+                      <Clock className="mr-2 h-4 w-4" />
+                      {formData.time 
+                        ? TIME_SLOTS.find(s => s.value === formData.time)?.label 
+                        : "Pick a time"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-64 p-0" align="start">
+                    <div className="p-3 border-b">
+                      <div className="flex items-center gap-4 text-xs">
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                          <span>Available</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-3 h-3 rounded-full bg-destructive" />
+                          <span>Booked</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-3 grid grid-cols-2 gap-2 max-h-64 overflow-y-auto pointer-events-auto">
+                      {TIME_SLOTS.map((slot) => {
+                        const isBooked = bookedTimesForDate.has(slot.value);
+                        const isSelected = formData.time === slot.value;
+                        
+                        return (
+                          <Button
+                            key={slot.value}
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            disabled={isBooked}
+                            onClick={() => {
+                              updateField("time", slot.value);
+                              setTimeOpen(false);
+                            }}
+                            className={cn(
+                              "h-9 text-sm font-medium transition-all",
+                              isBooked && "bg-destructive/10 text-destructive/50 border-destructive/20 cursor-not-allowed line-through",
+                              !isBooked && !isSelected && "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/20",
+                              isSelected && "bg-primary text-primary-foreground border-primary hover:bg-primary/90"
+                            )}
+                          >
+                            {slot.label}
+                          </Button>
+                        );
+                      })}
+                    </div>
+                  </PopoverContent>
+                </Popover>
               )}
-              {errors.time && formData.date && availableTimeSlots.length > 0 && (
+              {errors.time && formData.date && (
                 <p className="text-xs text-destructive">{errors.time}</p>
               )}
             </div>
