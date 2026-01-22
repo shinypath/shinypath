@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { getQuotes } from '@/lib/storage';
+import { useQuotes } from '@/hooks/useQuotes';
 import { CleaningQuote, QuoteStatus, CleaningFormType } from '@/lib/types';
 import { formatCurrency } from '@/lib/pricing';
 import { BookingDetailsDialog } from '@/components/admin/BookingDetailsDialog';
@@ -22,11 +22,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Search, Filter, RefreshCw } from 'lucide-react';
+import { Search, Filter, RefreshCw, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function SubmissionsPage() {
-  const [quotes, setQuotes] = useState<CleaningQuote[]>(getQuotes());
+  const { quotes, loading, fetchQuotes } = useQuotes();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<QuoteStatus | 'all'>('all');
   const [typeFilter, setTypeFilter] = useState<CleaningFormType | 'all'>('all');
@@ -34,7 +34,7 @@ export default function SubmissionsPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const refreshQuotes = () => {
-    setQuotes(getQuotes());
+    fetchQuotes();
   };
 
   const filteredQuotes = useMemo(() => {
@@ -114,8 +114,8 @@ export default function SubmissionsPage() {
                 <SelectItem value="post-construction">Post-Construction</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="outline" onClick={refreshQuotes}>
-              <RefreshCw className="h-4 w-4 mr-2" />
+            <Button variant="outline" onClick={refreshQuotes} disabled={loading}>
+              {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-2" />}
               Refresh
             </Button>
           </div>
@@ -131,7 +131,11 @@ export default function SubmissionsPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {filteredQuotes.length === 0 ? (
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : filteredQuotes.length === 0 ? (
             <p className="text-muted-foreground text-center py-12">
               No submissions found. Adjust your filters or wait for new quote requests.
             </p>

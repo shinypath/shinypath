@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FormLabel } from "./FormLabel";
 import { FormInput } from "./FormInput";
 import { FormTextarea } from "./FormTextarea";
-import { saveQuote } from "@/lib/storage";
+import { useQuotes } from "@/hooks/useQuotes";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Loader2, HardHat } from "lucide-react";
@@ -14,6 +14,7 @@ interface Errors {
 
 export function PostConstructionForm() {
   const { toast } = useToast();
+  const { createQuote } = useQuotes();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
 
@@ -70,7 +71,7 @@ export function PostConstructionForm() {
     setIsSubmitting(true);
 
     try {
-      saveQuote({
+      await createQuote({
         form_type: "post-construction",
         cleaning_type: "post-construction",
         frequency: "one-time",
