@@ -42,8 +42,8 @@ export default function SubmissionsPage() {
       .filter((quote) => {
         const matchesSearch = 
           quote.client_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          quote.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          quote.address.toLowerCase().includes(searchTerm.toLowerCase());
+          quote.client_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          quote.client_address.toLowerCase().includes(searchTerm.toLowerCase());
         
         const matchesStatus = statusFilter === 'all' || quote.status === statusFilter;
         const matchesType = typeFilter === 'all' || quote.form_type === typeFilter;
@@ -159,7 +159,7 @@ export default function SubmissionsPage() {
                       <TableCell>
                         <div>
                           <p className="font-medium">{quote.client_name}</p>
-                          <p className="text-xs text-muted-foreground">{quote.email}</p>
+                          <p className="text-xs text-muted-foreground">{quote.client_email}</p>
                         </div>
                       </TableCell>
                       <TableCell>
