@@ -1,18 +1,16 @@
-import { useState, useMemo } from 'react';
-import { getQuotes } from '@/lib/storage';
+import { useMemo, useState } from 'react';
+import { useQuotes } from '@/hooks/useQuotes';
 import { CleaningQuote, QuoteStatus } from '@/lib/types';
 import { BookingDetailsDialog } from '@/components/admin/BookingDetailsDialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { 
   format, 
   startOfMonth, 
   endOfMonth, 
   eachDayOfInterval, 
   isSameMonth, 
-  isSameDay,
   addMonths,
   subMonths,
   startOfWeek,
@@ -22,14 +20,10 @@ import {
 } from 'date-fns';
 
 export default function CalendarPage() {
-  const [quotes, setQuotes] = useState<CleaningQuote[]>(getQuotes());
+  const { quotes, loading, fetchQuotes, updateQuoteStatus, deleteQuote } = useQuotes();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedBooking, setSelectedBooking] = useState<CleaningQuote | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-
-  const refreshQuotes = () => {
-    setQuotes(getQuotes());
-  };
 
   const calendarDays = useMemo(() => {
     const monthStart = startOfMonth(currentMonth);
@@ -65,6 +59,14 @@ export default function CalendarPage() {
   };
 
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -163,7 +165,7 @@ export default function CalendarPage() {
                           statusBadgeColors[booking.status]
                         } ${isPastDay ? 'opacity-50' : ''} hover:opacity-80`}
                       >
-                        {booking.preferred_time.slice(0, 5)} {booking.cleaning_type}
+                        {booking.preferred_time?.slice(0, 5)} {booking.cleaning_type}
                       </button>
                     ))}
                     {dayBookings.length > 3 && (
@@ -183,7 +185,9 @@ export default function CalendarPage() {
         booking={selectedBooking}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        onUpdate={refreshQuotes}
+        onUpdate={fetchQuotes}
+        onStatusChange={updateQuoteStatus}
+        onDelete={deleteQuote}
       />
     </div>
   );
