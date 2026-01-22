@@ -82,7 +82,7 @@ export function useQuotes() {
   const createQuote = async (quote: QuoteInsert): Promise<CleaningQuote | null> => {
     const { data, error: insertError } = await supabase
       .from('cleaning_quotes')
-      .insert([quote] as any)
+      .insert([quote])
       .select()
       .single();
 
@@ -91,13 +91,13 @@ export function useQuotes() {
     }
 
     await fetchQuotes();
-    return data as unknown as CleaningQuote;
+    return data as CleaningQuote;
   };
 
   const updateQuoteStatus = async (id: string, status: QuoteStatus): Promise<CleaningQuote | null> => {
     const { data, error: updateError } = await supabase
       .from('cleaning_quotes')
-      .update({ status, updated_at: new Date().toISOString() } as any)
+      .update({ status, updated_at: new Date().toISOString() })
       .eq('id', id)
       .select()
       .single();
@@ -107,7 +107,7 @@ export function useQuotes() {
     }
 
     await fetchQuotes();
-    return data as unknown as CleaningQuote;
+    return data as CleaningQuote;
   };
 
   const deleteQuote = async (id: string): Promise<boolean> => {
@@ -135,7 +135,7 @@ export function useQuotes() {
       throw new Error(fetchError.message);
     }
 
-    return data as unknown as CleaningQuote | null;
+    return data as CleaningQuote | null;
   };
 
   return {
