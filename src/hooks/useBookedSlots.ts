@@ -75,53 +75,51 @@ export function useBookedSlots() {
 
   /**
    * Check if a specific date/time combination is already booked
+   * DISABLED: Always returns false to allow multiple bookings
    */
-  const isSlotBooked = useCallback((date: string, time: string): boolean => {
-    return bookedSlots.some(slot => slot.date === date && slot.time === time);
-  }, [bookedSlots]);
+  const isSlotBooked = useCallback((_date: string, _time: string): boolean => {
+    return false; // Blocking disabled - allow multiple bookings
+  }, []);
 
   /**
    * Get all booked times for a specific date
+   * DISABLED: Always returns empty array to allow multiple bookings
    */
-  const getBookedTimesForDate = useCallback((date: string): string[] => {
-    return bookedSlots
-      .filter(slot => slot.date === date)
-      .map(slot => slot.time);
-  }, [bookedSlots]);
+  const getBookedTimesForDate = useCallback((_date: string): string[] => {
+    return []; // Blocking disabled - allow multiple bookings
+  }, []);
 
   /**
    * Get count of booked slots for a date
+   * DISABLED: Always returns 0 to allow multiple bookings
    */
-  const getBookedCountForDate = useCallback((date: string): number => {
-    return getBookedTimesForDate(date).length;
-  }, [getBookedTimesForDate]);
+  const getBookedCountForDate = useCallback((_date: string): number => {
+    return 0; // Blocking disabled - allow multiple bookings
+  }, []);
 
   /**
    * Check if a date has any available slots
+   * DISABLED: Always returns false (never fully booked)
    */
-  const isDateFullyBooked = useCallback((date: string): boolean => {
-    return getBookedCountForDate(date) >= TOTAL_DAILY_SLOTS;
-  }, [getBookedCountForDate]);
+  const isDateFullyBooked = useCallback((_date: string): boolean => {
+    return false; // Blocking disabled - allow multiple bookings
+  }, []);
 
   /**
    * Get availability status for a date
-   * - 'available': 0-3 slots booked (8+ available)
-   * - 'limited': 4-10 slots booked (1-7 available)  
-   * - 'full': 11 slots booked (0 available)
+   * DISABLED: Always returns 'available' to allow multiple bookings
    */
-  const getDateAvailability = useCallback((date: string): DateAvailability => {
-    const bookedCount = getBookedCountForDate(date);
-    if (bookedCount >= TOTAL_DAILY_SLOTS) return 'full';
-    if (bookedCount >= 4) return 'limited';
-    return 'available';
-  }, [getBookedCountForDate]);
+  const getDateAvailability = useCallback((_date: string): DateAvailability => {
+    return 'available'; // Blocking disabled - allow multiple bookings
+  }, []);
 
   /**
    * Get available slots count for a date
+   * DISABLED: Always returns full capacity to allow multiple bookings
    */
-  const getAvailableSlotsCount = useCallback((date: string): number => {
-    return Math.max(0, TOTAL_DAILY_SLOTS - getBookedCountForDate(date));
-  }, [getBookedCountForDate]);
+  const getAvailableSlotsCount = useCallback((_date: string): number => {
+    return TOTAL_DAILY_SLOTS; // Blocking disabled - allow multiple bookings
+  }, []);
 
   return {
     bookedSlots,
