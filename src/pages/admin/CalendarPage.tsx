@@ -37,9 +37,15 @@ export default function CalendarPage() {
     return eachDayOfInterval({ start: calendarStart, end: calendarEnd });
   }, [currentMonth]);
 
+  // Only show house cleaning appointments on calendar (they have date/time selection)
+  const houseCleaningQuotes = useMemo(() => 
+    quotes.filter(q => q.form_type === 'house'), 
+    [quotes]
+  );
+
   const getBookingsForDay = (date: Date) => {
     const dateStr = format(date, 'yyyy-MM-dd');
-    return quotes.filter(q => q.preferred_date === dateStr);
+    return houseCleaningQuotes.filter(q => q.preferred_date === dateStr);
   };
 
   const statusColors: Record<QuoteStatus, string> = {
