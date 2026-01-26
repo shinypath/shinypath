@@ -4,7 +4,8 @@ import { CleaningQuote, QuoteStatus } from '@/lib/types';
 import { BookingDetailsDialog } from '@/components/admin/BookingDetailsDialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { ChevronLeft, ChevronRight, Loader2, Clock, User } from 'lucide-react';
 import { 
   format, 
   startOfMonth, 
@@ -16,7 +17,8 @@ import {
   startOfWeek,
   endOfWeek,
   isToday,
-  isPast
+  isPast,
+  isSameDay
 } from 'date-fns';
 
 export default function CalendarPage() {
@@ -24,6 +26,7 @@ export default function CalendarPage() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedBooking, setSelectedBooking] = useState<CleaningQuote | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   const calendarDays = useMemo(() => {
     const monthStart = startOfMonth(currentMonth);
@@ -57,6 +60,19 @@ export default function CalendarPage() {
     setSelectedBooking(booking);
     setDialogOpen(true);
   };
+
+  const handleDateClick = (day: Date, isMobile: boolean) => {
+    if (isMobile) {
+      // On mobile, select the date to show bookings list
+      if (selectedDate && isSameDay(selectedDate, day)) {
+        setSelectedDate(null); // Toggle off if already selected
+      } else {
+        setSelectedDate(day);
+      }
+    }
+  };
+
+  const selectedDateBookings = selectedDate ? getBookingsForDay(selectedDate) : [];
 
   const weekDaysFull = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const weekDaysShort = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
@@ -129,43 +145,55 @@ export default function CalendarPage() {
               const isCurrentMonth = isSameMonth(day, currentMonth);
               const isCurrentDay = isToday(day);
               const isPastDay = isPast(day) && !isCurrentDay;
+              const isSelected = selectedDate && isSameDay(selectedDate, day);
 
               return (
                 <div
                   key={day.toISOString()}
-                  className={`min-h-[70px] sm:min-h-[100px] md:min-h-[120px] p-1 sm:p-2 border rounded-lg ${
-                    isCurrentMonth ? 'bg-background' : 'bg-muted/30'
-                  } ${isCurrentDay ? 'ring-2 ring-primary' : ''}`}
+                  onClick={() => handleDateClick(day, true)}
+                  className={`
+                    aspect-square sm:aspect-auto sm:min-h-[100px] md:min-h-[120px] 
+                    p-1 sm:p-2 border rounded-lg cursor-pointer md:cursor-default
+                    transition-colors
+                    ${isCurrentMonth ? 'bg-background' : 'bg-muted/30'}
+                    ${isCurrentDay ? 'ring-2 ring-primary' : ''}
+                    ${isSelected ? 'bg-primary/10 border-primary' : ''}
+                  `}
                 >
-                  <div className={`text-xs sm:text-sm font-medium mb-1 ${
+                  <div className={`text-xs sm:text-sm font-medium ${
                     isCurrentMonth ? 'text-foreground' : 'text-muted-foreground'
                   } ${isCurrentDay ? 'text-primary' : ''}`}>
                     {format(day, 'd')}
                   </div>
                   
-                  {/* Mobile: dots with larger touch targets */}
-                  <div className="md:hidden flex flex-wrap gap-1.5">
-                    {dayBookings.slice(0, 4).map((booking) => (
-                      <button
-                        key={booking.id}
-                        onClick={() => handleBookingClick(booking)}
-                        className={`w-3 h-3 rounded-full ${statusColors[booking.status]} ${
-                          isPastDay ? 'opacity-50' : ''
-                        } touch-target flex items-center justify-center`}
-                        title={`${booking.client_name} - ${booking.cleaning_type}`}
-                      />
-                    ))}
-                    {dayBookings.length > 4 && (
-                      <span className="text-[10px] text-muted-foreground">+{dayBookings.length - 4}</span>
+                  {/* Mobile: just show dots indicator */}
+                  <div className="md:hidden flex justify-center mt-1 gap-0.5">
+                    {dayBookings.length > 0 && (
+                      <div className="flex gap-0.5">
+                        {dayBookings.slice(0, 3).map((booking) => (
+                          <div
+                            key={booking.id}
+                            className={`w-1.5 h-1.5 rounded-full ${statusColors[booking.status]} ${
+                              isPastDay ? 'opacity-50' : ''
+                            }`}
+                          />
+                        ))}
+                        {dayBookings.length > 3 && (
+                          <span className="text-[8px] text-muted-foreground ml-0.5">+{dayBookings.length - 3}</span>
+                        )}
+                      </div>
                     )}
                   </div>
 
                   {/* Desktop: list */}
-                  <div className="hidden md:block space-y-1">
+                  <div className="hidden md:block space-y-1 mt-1">
                     {dayBookings.slice(0, 3).map((booking) => (
                       <button
                         key={booking.id}
-                        onClick={() => handleBookingClick(booking)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleBookingClick(booking);
+                        }}
                         className={`w-full text-left text-xs p-1 rounded truncate ${
                           statusBadgeColors[booking.status]
                         } ${isPastDay ? 'opacity-50' : ''} hover:opacity-80`}
@@ -185,6 +213,64 @@ export default function CalendarPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Mobile: Selected date bookings list */}
+      {selectedDate && (
+        <Card className="md:hidden">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-tenor flex items-center justify-between">
+              <span>{format(selectedDate, 'EEEE, MMM d')}</span>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setSelectedDate(null)}
+                className="text-muted-foreground"
+              >
+                Clear
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            {selectedDateBookings.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                No bookings for this date
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {selectedDateBookings.map((booking) => (
+                  <button
+                    key={booking.id}
+                    onClick={() => handleBookingClick(booking)}
+                    className="w-full p-3 border rounded-lg text-left hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center gap-2">
+                        <User className="w-4 h-4 text-muted-foreground" />
+                        <span className="font-medium text-sm">{booking.client_name}</span>
+                      </div>
+                      <Badge className={statusBadgeColors[booking.status]}>
+                        {booking.status}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {booking.preferred_time?.slice(0, 5) || 'No time'}
+                      </span>
+                      <span>{booking.cleaning_type}</span>
+                      {booking.total && (
+                        <span className="font-medium text-foreground">
+                          ${booking.total.toFixed(2)}
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <BookingDetailsDialog
         booking={selectedBooking}
