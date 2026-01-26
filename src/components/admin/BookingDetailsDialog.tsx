@@ -158,28 +158,30 @@ export function BookingDetailsDialog({
           {/* Service Details */}
           <div>
             <h3 className="font-tenor text-lg tracking-wide mb-3">Service Details</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span>{booking.preferred_date}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <span>{booking.preferred_time || 'Not specified'}</span>
-              </div>
-            </div>
             
-            <div className="mt-4 space-y-2">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Type:</span>
-                <span className="font-medium capitalize">{booking.cleaning_type}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Frequency:</span>
-                <span className="font-medium">{booking.frequency}</span>
-              </div>
-              {booking.form_type === 'house' && (
-                <>
+            {/* House Cleaning specific fields */}
+            {booking.form_type === 'house' && (
+              <>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <span>{booking.preferred_date}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <span>{booking.preferred_time || 'Not specified'}</span>
+                  </div>
+                </div>
+                
+                <div className="mt-4 space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Type:</span>
+                    <span className="font-medium capitalize">{booking.cleaning_type}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Frequency:</span>
+                    <span className="font-medium">{booking.frequency}</span>
+                  </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Rooms:</span>
                     <span>
@@ -198,13 +200,43 @@ export function BookingDetailsDialog({
                       <span>{booking.laundry_persons} person(s)</span>
                     </div>
                   )}
-                </>
-              )}
-            </div>
+                </div>
+              </>
+            )}
+
+            {/* Office Cleaning specific fields */}
+            {booking.form_type === 'office' && (
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Service:</span>
+                  <span className="font-medium">Office Cleaning</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Status:</span>
+                  <span className="font-medium">Quote Request (awaiting assessment)</span>
+                </div>
+              </div>
+            )}
+
+            {/* Post-Construction specific fields */}
+            {booking.form_type === 'post-construction' && (
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Service:</span>
+                  <span className="font-medium">Post-Construction Cleaning</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Status:</span>
+                  <span className="font-medium">Quote Request (awaiting assessment)</span>
+                </div>
+              </div>
+            )}
 
             {booking.details && (
               <div className="mt-4 p-3 bg-muted rounded-lg">
-                <p className="text-sm text-muted-foreground">Additional Notes:</p>
+                <p className="text-sm text-muted-foreground">
+                  {booking.form_type === 'house' ? 'Additional Notes:' : 'Project Details:'}
+                </p>
                 <p className="mt-1">{booking.details}</p>
               </div>
             )}
@@ -241,45 +273,50 @@ export function BookingDetailsDialog({
           <div>
             <h3 className="font-tenor text-lg tracking-wide mb-3">Actions</h3>
             <div className="flex flex-wrap gap-2">
-              {booking.status !== 'confirmed' && booking.status !== 'cancelled' && (
-                <Button 
-                  variant="default" 
-                  onClick={() => handleStatusChange('confirmed')}
-                  disabled={isUpdating}
-                >
-                  {isUpdating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CheckCircle className="h-4 w-4 mr-2" />}
-                  Confirm
-                </Button>
-              )}
-              {booking.status === 'confirmed' && (
-                <Button 
-                  variant="default"
-                  onClick={() => handleStatusChange('completed')}
-                  disabled={isUpdating}
-                >
-                  {isUpdating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CheckCircle className="h-4 w-4 mr-2" />}
-                  Mark Completed
-                </Button>
-              )}
-              {booking.status !== 'cancelled' && (
-                <Button 
-                  variant="outline" 
-                  onClick={() => handleStatusChange('cancelled')}
-                  disabled={isUpdating}
-                >
-                  {isUpdating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <XCircle className="h-4 w-4 mr-2" />}
-                  Cancel
-                </Button>
-              )}
-              {booking.status === 'cancelled' && (
-                <Button 
-                  variant="outline" 
-                  onClick={() => handleStatusChange('pending')}
-                  disabled={isUpdating}
-                >
-                  {isUpdating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <RotateCcw className="h-4 w-4 mr-2" />}
-                  Reactivate
-                </Button>
+              {/* Confirm/Cancel only for House Cleaning (has scheduled date/time) */}
+              {booking.form_type === 'house' && (
+                <>
+                  {booking.status !== 'confirmed' && booking.status !== 'cancelled' && (
+                    <Button 
+                      variant="default" 
+                      onClick={() => handleStatusChange('confirmed')}
+                      disabled={isUpdating}
+                    >
+                      {isUpdating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CheckCircle className="h-4 w-4 mr-2" />}
+                      Confirm
+                    </Button>
+                  )}
+                  {booking.status === 'confirmed' && (
+                    <Button 
+                      variant="default"
+                      onClick={() => handleStatusChange('completed')}
+                      disabled={isUpdating}
+                    >
+                      {isUpdating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CheckCircle className="h-4 w-4 mr-2" />}
+                      Mark Completed
+                    </Button>
+                  )}
+                  {booking.status !== 'cancelled' && (
+                    <Button 
+                      variant="outline" 
+                      onClick={() => handleStatusChange('cancelled')}
+                      disabled={isUpdating}
+                    >
+                      {isUpdating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <XCircle className="h-4 w-4 mr-2" />}
+                      Cancel
+                    </Button>
+                  )}
+                  {booking.status === 'cancelled' && (
+                    <Button 
+                      variant="outline" 
+                      onClick={() => handleStatusChange('pending')}
+                      disabled={isUpdating}
+                    >
+                      {isUpdating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <RotateCcw className="h-4 w-4 mr-2" />}
+                      Reactivate
+                    </Button>
+                  )}
+                </>
               )}
               
               <AlertDialog>
