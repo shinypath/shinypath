@@ -95,12 +95,12 @@ export default function PricingConfigPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-tenor tracking-wide text-foreground">Pricing Configuration</h2>
-          <p className="text-muted-foreground">Manage prices for cleaning services</p>
+          <h2 className="text-xl sm:text-2xl font-tenor tracking-wide text-foreground">Pricing Configuration</h2>
+          <p className="text-sm text-muted-foreground">Manage prices for cleaning services</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="outline">

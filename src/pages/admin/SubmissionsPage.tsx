@@ -140,53 +140,90 @@ export default function SubmissionsPage() {
               No submissions found. Adjust your filters or wait for new quote requests.
             </p>
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Client</TableHead>
-                    <TableHead>Form</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Time</TableHead>
-                    <TableHead>Total</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredQuotes.map((quote) => (
-                    <TableRow 
-                      key={quote.id}
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleRowClick(quote)}
-                    >
-                      <TableCell>
-                        <div>
-                          <p className="font-medium">{quote.client_name}</p>
-                          <p className="text-xs text-muted-foreground">{quote.client_email}</p>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">
-                          {typeLabels[quote.form_type]}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="capitalize">{quote.cleaning_type}</TableCell>
-                      <TableCell>{quote.preferred_date}</TableCell>
-                      <TableCell>{quote.preferred_time}</TableCell>
-                      <TableCell className="font-medium">
+            <>
+              {/* Mobile Card View */}
+              <div className="md:hidden space-y-3">
+                {filteredQuotes.map((quote) => (
+                  <div
+                    key={quote.id}
+                    className="p-4 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+                    onClick={() => handleRowClick(quote)}
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div className="min-w-0">
+                        <p className="font-medium truncate">{quote.client_name}</p>
+                        <p className="text-xs text-muted-foreground truncate">{quote.client_email}</p>
+                      </div>
+                      <Badge className={`${statusColors[quote.status]} flex-shrink-0`}>
+                        {quote.status}
+                      </Badge>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                      <Badge variant="outline" className="text-xs">
+                        {typeLabels[quote.form_type]}
+                      </Badge>
+                      <span>•</span>
+                      <span>{quote.preferred_date}</span>
+                      <span>•</span>
+                      <span>{quote.preferred_time}</span>
+                      <span>•</span>
+                      <span className="font-medium text-foreground">
                         {quote.total > 0 ? formatCurrency(quote.total) : 'Quote'}
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={statusColors[quote.status]}>
-                          {quote.status}
-                        </Badge>
-                      </TableCell>
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Client</TableHead>
+                      <TableHead>Form</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Time</TableHead>
+                      <TableHead>Total</TableHead>
+                      <TableHead>Status</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredQuotes.map((quote) => (
+                      <TableRow 
+                        key={quote.id}
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => handleRowClick(quote)}
+                      >
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">{quote.client_name}</p>
+                            <p className="text-xs text-muted-foreground">{quote.client_email}</p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline">
+                            {typeLabels[quote.form_type]}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="capitalize">{quote.cleaning_type}</TableCell>
+                        <TableCell>{quote.preferred_date}</TableCell>
+                        <TableCell>{quote.preferred_time}</TableCell>
+                        <TableCell className="font-medium">
+                          {quote.total > 0 ? formatCurrency(quote.total) : 'Quote'}
+                        </TableCell>
+                        <TableCell>
+                          <Badge className={statusColors[quote.status]}>
+                            {quote.status}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

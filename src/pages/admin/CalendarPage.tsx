@@ -58,7 +58,8 @@ export default function CalendarPage() {
     setDialogOpen(true);
   };
 
-  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const weekDaysFull = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const weekDaysShort = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
   if (loading) {
     return (
@@ -110,12 +111,13 @@ export default function CalendarPage() {
         <CardContent>
           {/* Week day headers */}
           <div className="grid grid-cols-7 gap-1 mb-2">
-            {weekDays.map((day) => (
+            {weekDaysFull.map((day, idx) => (
               <div 
                 key={day} 
-                className="text-center text-sm font-medium text-muted-foreground p-2"
+                className="text-center text-xs sm:text-sm font-medium text-muted-foreground p-1 sm:p-2"
               >
-                {day}
+                <span className="hidden sm:inline">{day}</span>
+                <span className="sm:hidden">{weekDaysShort[idx]}</span>
               </div>
             ))}
           </div>
@@ -131,28 +133,31 @@ export default function CalendarPage() {
               return (
                 <div
                   key={day.toISOString()}
-                  className={`min-h-[100px] md:min-h-[120px] p-2 border rounded-lg ${
+                  className={`min-h-[70px] sm:min-h-[100px] md:min-h-[120px] p-1 sm:p-2 border rounded-lg ${
                     isCurrentMonth ? 'bg-background' : 'bg-muted/30'
                   } ${isCurrentDay ? 'ring-2 ring-primary' : ''}`}
                 >
-                  <div className={`text-sm font-medium mb-1 ${
+                  <div className={`text-xs sm:text-sm font-medium mb-1 ${
                     isCurrentMonth ? 'text-foreground' : 'text-muted-foreground'
                   } ${isCurrentDay ? 'text-primary' : ''}`}>
                     {format(day, 'd')}
                   </div>
                   
-                  {/* Mobile: dots */}
-                  <div className="md:hidden flex flex-wrap gap-1">
-                    {dayBookings.map((booking) => (
+                  {/* Mobile: dots with larger touch targets */}
+                  <div className="md:hidden flex flex-wrap gap-1.5">
+                    {dayBookings.slice(0, 4).map((booking) => (
                       <button
                         key={booking.id}
                         onClick={() => handleBookingClick(booking)}
-                        className={`w-2 h-2 rounded-full ${statusColors[booking.status]} ${
+                        className={`w-3 h-3 rounded-full ${statusColors[booking.status]} ${
                           isPastDay ? 'opacity-50' : ''
-                        }`}
+                        } touch-target flex items-center justify-center`}
                         title={`${booking.client_name} - ${booking.cleaning_type}`}
                       />
                     ))}
+                    {dayBookings.length > 4 && (
+                      <span className="text-[10px] text-muted-foreground">+{dayBookings.length - 4}</span>
+                    )}
                   </div>
 
                   {/* Desktop: list */}
