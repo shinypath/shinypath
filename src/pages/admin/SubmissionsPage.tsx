@@ -163,9 +163,9 @@ export default function SubmissionsPage() {
                         {typeLabels[quote.form_type]}
                       </Badge>
                       <span>•</span>
-                      <span>{quote.preferred_date}</span>
+                      <span>{quote.form_type === 'house' ? quote.preferred_date : '—'}</span>
                       <span>•</span>
-                      <span>{quote.preferred_time}</span>
+                      <span>{quote.form_type === 'house' ? quote.preferred_time : '—'}</span>
                       <span>•</span>
                       <span className="font-medium text-foreground">
                         {quote.total > 0 ? formatCurrency(quote.total) : 'Quote'}
@@ -208,8 +208,8 @@ export default function SubmissionsPage() {
                           </Badge>
                         </TableCell>
                         <TableCell className="capitalize">{quote.cleaning_type}</TableCell>
-                        <TableCell>{quote.preferred_date}</TableCell>
-                        <TableCell>{quote.preferred_time}</TableCell>
+                        <TableCell>{quote.form_type === 'house' ? quote.preferred_date : '—'}</TableCell>
+                        <TableCell>{quote.form_type === 'house' ? quote.preferred_time : '—'}</TableCell>
                         <TableCell className="font-medium">
                           {quote.total > 0 ? formatCurrency(quote.total) : 'Quote'}
                         </TableCell>
