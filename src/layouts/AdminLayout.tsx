@@ -36,9 +36,9 @@ export default function AdminLayout() {
       <div className="min-h-screen flex w-full">
         <AdminSidebar />
         <main className="flex-1 flex flex-col">
-          <header className="h-14 border-b border-border flex items-center px-4 bg-background sticky top-0 z-10">
-            <SidebarTrigger />
-            <h1 className="ml-4 font-tenor text-lg tracking-wide text-foreground">
+          <header className="h-14 border-b border-border flex items-center px-3 sm:px-4 bg-background sticky top-0 z-10">
+            <SidebarTrigger className="h-9 w-9 md:h-7 md:w-7 touch-target" />
+            <h1 className="ml-3 sm:ml-4 font-tenor text-base sm:text-lg tracking-wide text-foreground truncate">
               Admin Panel
             </h1>
           </header>

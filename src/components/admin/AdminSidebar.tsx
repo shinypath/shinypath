@@ -68,15 +68,15 @@ export function AdminSidebar() {
                 
                 return (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={isActive}>
+                    <SidebarMenuButton asChild isActive={isActive} className="min-h-[44px]">
                       <NavLink 
                         to={item.url} 
                         className={cn(
-                          "flex items-center gap-3 text-white/90 hover:text-white hover:bg-white/10",
+                          "flex items-center gap-3 text-white/90 hover:text-white hover:bg-white/10 py-3",
                           isActive && "bg-white/20 text-white"
                         )}
                       >
-                        <item.icon className="h-4 w-4" />
+                        <item.icon className="h-5 w-5" />
                         <span className="font-sans">{item.title}</span>
                       </NavLink>
                     </SidebarMenuButton>
@@ -91,10 +91,10 @@ export function AdminSidebar() {
       <SidebarFooter className="border-t border-sidebar-border p-4">
         <Button 
           variant="ghost" 
-          className="w-full justify-start gap-3 text-white/90 hover:text-white hover:bg-white/10" 
+          className="w-full justify-start gap-3 text-white/90 hover:text-white hover:bg-white/10 min-h-[44px] py-3" 
           onClick={signOut}
         >
-          <LogOut className="h-4 w-4" />
+          <LogOut className="h-5 w-5" />
           {!collapsed && <span className="font-sans">Sign Out</span>}
         </Button>
       </SidebarFooter>

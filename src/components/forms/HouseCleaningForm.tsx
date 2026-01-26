@@ -263,7 +263,7 @@ export function HouseCleaningForm() {
           </div>
 
           {/* Rooms Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             <div className="space-y-2">
               <FormLabel>Kitchen</FormLabel>
               <FormSelect
@@ -301,7 +301,7 @@ export function HouseCleaningForm() {
           {/* Extras */}
           <div className="space-y-3">
             <FormLabel>Extras</FormLabel>
-            <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
               <ExtraToggle
                 value="inside-fridge"
                 label="Inside Fridge"

@@ -213,4 +213,17 @@
     color: hsl(var(--status-cancelled));
     @apply font-medium;
   }
+
+  /* Responsive utility classes */
+  .mobile-card-grid {
+    @apply grid gap-3 sm:gap-4;
+  }
+
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px] flex items-center justify-center;
+  }
+
+  .responsive-heading {
+    @apply text-xl sm:text-2xl;
+  }
 }

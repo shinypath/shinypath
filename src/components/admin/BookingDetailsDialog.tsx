@@ -92,9 +92,9 @@ export function BookingDetailsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto mx-4 sm:mx-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center justify-between">
+          <DialogTitle className="flex items-center justify-between gap-2 flex-wrap">
             <span>Booking Details</span>
             <Badge className={statusColors[booking.status]}>
               {booking.status}
@@ -108,19 +108,19 @@ export function BookingDetailsDialog({
             <h3 className="font-tenor text-lg tracking-wide mb-3">Client Information</h3>
             <div className="bg-muted/50 rounded-lg p-4 space-y-3">
               <p className="font-medium text-lg">{booking.client_name}</p>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-4">
                 <a 
                   href={`mailto:${booking.client_email}`}
-                  className="flex items-center gap-2 text-primary hover:underline"
+                  className="flex items-center gap-2 text-primary hover:underline text-sm sm:text-base break-all"
                 >
-                  <Mail className="h-4 w-4" />
+                  <Mail className="h-4 w-4 flex-shrink-0" />
                   {booking.client_email}
                 </a>
                 <a 
                   href={`tel:${booking.client_phone}`}
-                  className="flex items-center gap-2 text-primary hover:underline"
+                  className="flex items-center gap-2 text-primary hover:underline text-sm sm:text-base"
                 >
-                  <Phone className="h-4 w-4" />
+                  <Phone className="h-4 w-4 flex-shrink-0" />
                   {booking.client_phone}
                 </a>
               </div>
@@ -133,22 +133,22 @@ export function BookingDetailsDialog({
 
           {/* Quick Actions */}
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" asChild>
+            <Button variant="outline" size="sm" className="min-h-[44px] sm:min-h-0" asChild>
               <a href={`mailto:${booking.client_email}`}>
-                <Mail className="h-4 w-4 mr-2" />
-                Email
+                <Mail className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Email</span>
               </a>
             </Button>
-            <Button variant="outline" size="sm" asChild>
+            <Button variant="outline" size="sm" className="min-h-[44px] sm:min-h-0" asChild>
               <a href={`sms:${booking.client_phone}`}>
-                <MessageSquare className="h-4 w-4 mr-2" />
-                SMS
+                <MessageSquare className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">SMS</span>
               </a>
             </Button>
-            <Button variant="outline" size="sm" asChild>
+            <Button variant="outline" size="sm" className="min-h-[44px] sm:min-h-0" asChild>
               <a href={`tel:${booking.client_phone}`}>
-                <Phone className="h-4 w-4 mr-2" />
-                Call
+                <Phone className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Call</span>
               </a>
             </Button>
           </div>

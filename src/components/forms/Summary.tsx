@@ -33,10 +33,10 @@ export function Summary({
   const discountPercent = freqConfig?.discount ?? 0;
 
   return (
-    <div className="calculator-panel sticky top-4">
+    <div className="calculator-panel lg:sticky lg:top-4 shadow-md lg:shadow-sm">
       <div className="flex items-center gap-2 mb-4">
         <Sparkles className="w-5 h-5 text-primary" />
-        <h3 className="font-display text-lg uppercase tracking-wide">Your Quote</h3>
+        <h3 className="font-display text-base sm:text-lg uppercase tracking-wide">Your Quote</h3>
       </div>
 
       <div className="space-y-3 text-sm">

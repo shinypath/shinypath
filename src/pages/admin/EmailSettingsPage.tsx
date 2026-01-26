@@ -197,50 +197,52 @@ export default function EmailSettingsPage() {
                     icon: <Mail className="h-4 w-4" />,
                   };
                   
-                  return (
-                    <div
-                      key={template.id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                    >
-                      <div className="flex items-start gap-4">
-                        <div className={`p-2 rounded-lg ${template.enabled ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
-                          {info.icon}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h4 className="font-medium">{info.label}</h4>
-                            <Badge variant={template.enabled ? 'default' : 'secondary'}>
-                              {template.enabled ? 'Active' : 'Disabled'}
-                            </Badge>
+                    return (
+                      <div
+                        key={template.id}
+                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-3 sm:p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                      >
+                        <div className="flex items-start gap-3 sm:gap-4">
+                          <div className={`p-2 rounded-lg flex-shrink-0 ${template.enabled ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                            {info.icon}
                           </div>
-                          <p className="text-sm text-muted-foreground">{info.description}</p>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            Subject: {template.subject.substring(0, 50)}...
-                          </p>
+                          <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <h4 className="font-medium text-sm sm:text-base">{info.label}</h4>
+                              <Badge variant={template.enabled ? 'default' : 'secondary'} className="text-xs">
+                                {template.enabled ? 'Active' : 'Disabled'}
+                              </Badge>
+                            </div>
+                            <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">{info.description}</p>
+                            <p className="text-xs text-muted-foreground mt-1 truncate">
+                              Subject: {template.subject.substring(0, 30)}...
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 self-end sm:self-auto">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-9 w-9 p-0"
+                            onClick={() => setPreviewTemplate(template)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-9 w-9 p-0"
+                            onClick={() => setEditingTemplate({ ...template })}
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                          <Switch
+                            checked={template.enabled}
+                            onCheckedChange={() => handleToggleTemplate(template)}
+                          />
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setPreviewTemplate(template)}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setEditingTemplate({ ...template })}
-                        >
-                          <Edit2 className="h-4 w-4" />
-                        </Button>
-                        <Switch
-                          checked={template.enabled}
-                          onCheckedChange={() => handleToggleTemplate(template)}
-                        />
-                      </div>
-                    </div>
-                  );
+                    );
                 })
               )}
             </CardContent>
