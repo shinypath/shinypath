@@ -94,9 +94,9 @@ export function BookingDetailsDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto mx-4 sm:mx-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center justify-between gap-2 flex-wrap">
-            <span>Booking Details</span>
-            <Badge className={statusColors[booking.status]}>
+          <DialogTitle className="flex items-center gap-4">
+            <span className="font-tenor uppercase tracking-wide">Booking Details</span>
+            <Badge className={`${statusColors[booking.status]} font-ubuntu hover:bg-inherit cursor-default`}>
               {booking.status}
             </Badge>
           </DialogTitle>
@@ -105,7 +105,7 @@ export function BookingDetailsDialog({
         <div className="space-y-6">
           {/* Client Information */}
           <div>
-            <h3 className="font-tenor text-lg tracking-wide mb-3">Client Information</h3>
+            <h3 className="font-ubuntu text-lg uppercase tracking-wide mb-3 text-primary">Client Information</h3>
             <div className="bg-muted/50 rounded-lg p-4 space-y-3">
               <p className="font-medium text-lg">{booking.client_name}</p>
               <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-4">
@@ -157,7 +157,7 @@ export function BookingDetailsDialog({
 
           {/* Service Details */}
           <div>
-            <h3 className="font-tenor text-lg tracking-wide mb-3">Service Details</h3>
+            <h3 className="font-ubuntu text-lg uppercase tracking-wide mb-3 text-primary">Service Details</h3>
             
             {/* House Cleaning specific fields */}
             {booking.form_type === 'house' && (
@@ -247,7 +247,7 @@ export function BookingDetailsDialog({
           {/* Pricing */}
           {booking.total > 0 && (
             <div>
-              <h3 className="font-tenor text-lg tracking-wide mb-3">Pricing</h3>
+              <h3 className="font-ubuntu text-lg uppercase tracking-wide mb-3 text-primary">Pricing</h3>
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Subtotal:</span>
@@ -271,7 +271,7 @@ export function BookingDetailsDialog({
 
           {/* Status Actions */}
           <div>
-            <h3 className="font-tenor text-lg tracking-wide mb-3">Actions</h3>
+            <h3 className="font-ubuntu text-lg uppercase tracking-wide mb-3 text-primary">Actions</h3>
             <div className="flex flex-wrap gap-2">
               {/* Confirm/Cancel only for House Cleaning (has scheduled date/time) */}
               {booking.form_type === 'house' && (
