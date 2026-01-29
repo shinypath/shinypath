@@ -23,7 +23,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Search, Filter, RefreshCw, Loader2 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Search, RefreshCw, Loader2, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function SubmissionsPage() {
@@ -33,6 +43,8 @@ export default function SubmissionsPage() {
   const [typeFilter, setTypeFilter] = useState<CleaningFormType | 'all'>('all');
   const [selectedBooking, setSelectedBooking] = useState<CleaningQuote | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [quoteToDelete, setQuoteToDelete] = useState<CleaningQuote | null>(null);
 
   const refreshQuotes = () => {
     fetchQuotes();
@@ -70,6 +82,20 @@ export default function SubmissionsPage() {
   const handleRowClick = (booking: CleaningQuote) => {
     setSelectedBooking(booking);
     setDialogOpen(true);
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent, quote: CleaningQuote) => {
+    e.stopPropagation();
+    setQuoteToDelete(quote);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (quoteToDelete) {
+      deleteQuote(quoteToDelete.id);
+      setDeleteDialogOpen(false);
+      setQuoteToDelete(null);
+    }
   };
 
   return (
@@ -168,6 +194,7 @@ export default function SubmissionsPage() {
                       <TableHead>Time</TableHead>
                       <TableHead>Total</TableHead>
                       <TableHead>Status</TableHead>
+                      <TableHead className="w-12"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -199,6 +226,16 @@ export default function SubmissionsPage() {
                             {quote.status}
                           </Badge>
                         </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                            onClick={(e) => handleDeleteClick(e, quote)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -217,6 +254,23 @@ export default function SubmissionsPage() {
         onStatusChange={updateQuoteStatus}
         onDelete={deleteQuote}
       />
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this submission from {quoteToDelete?.client_name}? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
