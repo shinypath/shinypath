@@ -3,6 +3,7 @@ import { useQuotes } from '@/hooks/useQuotes';
 import { CleaningQuote, QuoteStatus, CleaningFormType } from '@/lib/types';
 import { formatCurrency } from '@/lib/pricing';
 import { BookingDetailsDialog } from '@/components/admin/BookingDetailsDialog';
+import { SwipeableSubmissionCard } from '@/components/admin/SwipeableSubmissionCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -144,34 +145,14 @@ export default function SubmissionsPage() {
               {/* Mobile Card View */}
               <div className="md:hidden space-y-3">
                 {filteredQuotes.map((quote) => (
-                  <div
+                  <SwipeableSubmissionCard
                     key={quote.id}
-                    className="p-4 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+                    quote={quote}
                     onClick={() => handleRowClick(quote)}
-                  >
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="min-w-0">
-                        <p className="font-medium truncate">{quote.client_name}</p>
-                        <p className="text-xs text-muted-foreground truncate">{quote.client_email}</p>
-                      </div>
-                      <Badge className={`${statusColors[quote.status]} flex-shrink-0`}>
-                        {quote.status}
-                      </Badge>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                      <Badge variant="outline" className="text-xs">
-                        {typeLabels[quote.form_type]}
-                      </Badge>
-                      <span>•</span>
-                      <span>{quote.form_type === 'house' ? quote.preferred_date : '—'}</span>
-                      <span>•</span>
-                      <span>{quote.form_type === 'house' ? quote.preferred_time : '—'}</span>
-                      <span>•</span>
-                      <span className="font-medium text-foreground">
-                        {quote.total > 0 ? formatCurrency(quote.total) : 'Quote'}
-                      </span>
-                    </div>
-                  </div>
+                    onDelete={deleteQuote}
+                    statusColors={statusColors}
+                    typeLabels={typeLabels}
+                  />
                 ))}
               </div>
 
