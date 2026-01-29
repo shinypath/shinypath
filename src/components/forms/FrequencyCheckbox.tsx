@@ -38,11 +38,6 @@ export function FrequencyCheckbox({
       </div>
       <div className="flex-1">
         <span className="text-sm font-medium">{label}</span>
-        {discountLabel && (
-          <span className="ml-2 text-xs bg-status-confirmed/15 text-status-confirmed px-2 py-0.5 rounded-full">
-            {discountLabel}
-          </span>
-        )}
       </div>
     </button>
   );
