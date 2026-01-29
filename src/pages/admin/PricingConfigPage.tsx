@@ -93,6 +93,17 @@ export default function PricingConfigPage() {
     setHasChanges(true);
   };
 
+  const updateRoomPrice = (roomType: 'kitchens' | 'bathrooms' | 'bedrooms' | 'livingRooms', key: string, price: number) => {
+    setConfig(prev => ({
+      ...prev,
+      [roomType]: {
+        ...prev[roomType],
+        [key]: price
+      }
+    }));
+    setHasChanges(true);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -173,6 +184,106 @@ export default function PricingConfigPage() {
                       max={100}
                     />
                     <span className="text-muted-foreground">%</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* Kitchens */}
+        <AccordionItem value="kitchens" className="border rounded-lg px-4">
+          <AccordionTrigger className="text-lg font-medium">
+            Kitchens
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 py-4">
+              {Object.entries(config.kitchens).map(([qty, price]) => (
+                <div key={qty} className="space-y-2">
+                  <Label>{qty} kitchen{qty !== '1' ? 's' : ''}</Label>
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground">$</span>
+                    <Input
+                      type="number"
+                      value={price}
+                      onChange={(e) => updateRoomPrice('kitchens', qty, Number(e.target.value))}
+                      min={0}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* Bathrooms */}
+        <AccordionItem value="bathrooms" className="border rounded-lg px-4">
+          <AccordionTrigger className="text-lg font-medium">
+            Bathrooms
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 py-4">
+              {Object.entries(config.bathrooms).map(([qty, price]) => (
+                <div key={qty} className="space-y-2">
+                  <Label>{qty} bathroom{qty !== '1' ? 's' : ''}</Label>
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground">$</span>
+                    <Input
+                      type="number"
+                      value={price}
+                      onChange={(e) => updateRoomPrice('bathrooms', qty, Number(e.target.value))}
+                      min={0}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* Bedrooms */}
+        <AccordionItem value="bedrooms" className="border rounded-lg px-4">
+          <AccordionTrigger className="text-lg font-medium">
+            Bedrooms
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 py-4">
+              {Object.entries(config.bedrooms).map(([qty, price]) => (
+                <div key={qty} className="space-y-2">
+                  <Label>{qty} bedroom{qty !== '1' ? 's' : ''}</Label>
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground">$</span>
+                    <Input
+                      type="number"
+                      value={price}
+                      onChange={(e) => updateRoomPrice('bedrooms', qty, Number(e.target.value))}
+                      min={0}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* Living Rooms */}
+        <AccordionItem value="livingRooms" className="border rounded-lg px-4">
+          <AccordionTrigger className="text-lg font-medium">
+            Living Rooms
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 py-4">
+              {Object.entries(config.livingRooms).map(([qty, price]) => (
+                <div key={qty} className="space-y-2">
+                  <Label>{qty} living room{qty !== '1' ? 's' : ''}</Label>
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground">$</span>
+                    <Input
+                      type="number"
+                      value={price}
+                      onChange={(e) => updateRoomPrice('livingRooms', qty, Number(e.target.value))}
+                      min={0}
+                    />
                   </div>
                 </div>
               ))}
