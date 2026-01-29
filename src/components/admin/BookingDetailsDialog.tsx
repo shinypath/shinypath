@@ -58,6 +58,87 @@ export function BookingDetailsDialog({
 
   if (!booking) return null;
 
+  // Generate email template based on form type
+  const generateEmailTemplate = () => {
+    const clientName = booking.client_name.split(' ')[0]; // First name
+    let subject = '';
+    let body = '';
+
+    if (booking.form_type === 'house') {
+      subject = `Booking Confirmation - ${booking.preferred_date}`;
+      body = `Hi ${clientName},
+
+Thank you for your booking request with Shiny Path Cleaning!
+
+Here are your booking details:
+- Service: ${booking.cleaning_type} Cleaning
+- Date: ${booking.preferred_date}
+- Time: ${booking.preferred_time || 'To be confirmed'}
+- Address: ${booking.client_address}
+- Rooms: ${booking.kitchens} Kitchen, ${booking.bathrooms} Bath, ${booking.bedrooms} Bed, ${booking.living_rooms} Living
+${booking.extras.length > 0 ? `- Extras: ${booking.extras.join(', ')}` : ''}
+${booking.laundry_persons > 0 ? `- Laundry: ${booking.laundry_persons} person(s)` : ''}
+- Total: $${booking.total.toFixed(2)}
+
+Please confirm if everything looks correct.
+
+Best regards,
+Shiny Path Cleaning Team`;
+    } else if (booking.form_type === 'office') {
+      subject = 'Office Cleaning Quote Request';
+      body = `Hi ${clientName},
+
+Thank you for your office cleaning quote request with Shiny Path Cleaning!
+
+We have received your request and will assess your needs shortly.
+
+Your contact details:
+- Phone: ${booking.client_phone}
+- Address: ${booking.client_address}
+${booking.details ? `\nProject Details:\n${booking.details}` : ''}
+
+We will get back to you with a customized quote.
+
+Best regards,
+Shiny Path Cleaning Team`;
+    } else {
+      subject = 'Post-Construction Cleaning Quote Request';
+      body = `Hi ${clientName},
+
+Thank you for your post-construction cleaning quote request with Shiny Path Cleaning!
+
+We have received your request and will assess your needs shortly.
+
+Your contact details:
+- Phone: ${booking.client_phone}
+- Address: ${booking.client_address}
+${booking.details ? `\nProject Details:\n${booking.details}` : ''}
+
+We will get back to you with a customized quote.
+
+Best regards,
+Shiny Path Cleaning Team`;
+    }
+
+    return { subject, body };
+  };
+
+  // Generate SMS template based on form type
+  const generateSmsTemplate = () => {
+    const clientName = booking.client_name.split(' ')[0]; // First name
+    
+    if (booking.form_type === 'house') {
+      return `Hi ${clientName}! This is Shiny Path Cleaning confirming your ${booking.cleaning_type} cleaning on ${booking.preferred_date}${booking.preferred_time ? ` at ${booking.preferred_time}` : ''}. Total: $${booking.total.toFixed(2)}. Reply to confirm or call us with any questions!`;
+    } else if (booking.form_type === 'office') {
+      return `Hi ${clientName}! This is Shiny Path Cleaning. We received your office cleaning quote request. We'll assess your needs and get back to you shortly with a customized quote. Thank you!`;
+    } else {
+      return `Hi ${clientName}! This is Shiny Path Cleaning. We received your post-construction cleaning quote request. We'll assess your needs and get back to you shortly with a customized quote. Thank you!`;
+    }
+  };
+
+  const emailTemplate = generateEmailTemplate();
+  const smsTemplate = generateSmsTemplate();
+
   const handleStatusChange = async (status: QuoteStatus) => {
     setIsUpdating(true);
     try {
@@ -134,13 +215,13 @@ export function BookingDetailsDialog({
           {/* Quick Actions */}
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" className="min-h-[44px] sm:min-h-0" asChild>
-              <a href={`mailto:${booking.client_email}`}>
+              <a href={`mailto:${booking.client_email}?subject=${encodeURIComponent(emailTemplate.subject)}&body=${encodeURIComponent(emailTemplate.body)}`}>
                 <Mail className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">Email</span>
               </a>
             </Button>
             <Button variant="outline" size="sm" className="min-h-[44px] sm:min-h-0" asChild>
-              <a href={`sms:${booking.client_phone}`}>
+              <a href={`sms:${booking.client_phone}?body=${encodeURIComponent(smsTemplate)}`}>
                 <MessageSquare className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">SMS</span>
               </a>
