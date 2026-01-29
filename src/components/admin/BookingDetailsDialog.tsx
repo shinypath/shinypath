@@ -128,11 +128,40 @@ Shiny Path Cleaning Team`;
     const clientName = booking.client_name.split(' ')[0]; // First name
     
     if (booking.form_type === 'house') {
-      return `Hi ${clientName}! This is Shiny Path Cleaning confirming your ${booking.cleaning_type} cleaning on ${booking.preferred_date}${booking.preferred_time ? ` at ${booking.preferred_time}` : ''}. Total: $${booking.total.toFixed(2)}. Reply to confirm or call us with any questions!`;
+      const extras = booking.extras.length > 0 ? `\nExtras: ${booking.extras.join(', ')}` : '';
+      const laundry = booking.laundry_persons > 0 ? `\nLaundry: ${booking.laundry_persons} person(s)` : '';
+      const notes = booking.details ? `\nNotes: ${booking.details}` : '';
+      
+      return `Hi ${clientName}! This is Shiny Path Cleaning confirming your booking:
+
+Service: ${booking.cleaning_type} Cleaning
+Frequency: ${booking.frequency}
+Date: ${booking.preferred_date}
+Time: ${booking.preferred_time || 'To be confirmed'}
+Address: ${booking.client_address}
+Rooms: ${booking.kitchens} Kitchen, ${booking.bathrooms} Bath, ${booking.bedrooms} Bed, ${booking.living_rooms} Living${extras}${laundry}${notes}
+
+Total: $${booking.total.toFixed(2)}
+
+Reply to confirm or call us with any questions!`;
     } else if (booking.form_type === 'office') {
-      return `Hi ${clientName}! This is Shiny Path Cleaning. We received your office cleaning quote request. We'll assess your needs and get back to you shortly with a customized quote. Thank you!`;
+      const details = booking.details ? `\nProject Details: ${booking.details}` : '';
+      return `Hi ${clientName}! This is Shiny Path Cleaning. We received your office cleaning quote request.
+
+Contact: ${booking.client_phone}
+Email: ${booking.client_email}
+Address: ${booking.client_address}${details}
+
+We'll assess your needs and get back to you shortly with a customized quote. Thank you!`;
     } else {
-      return `Hi ${clientName}! This is Shiny Path Cleaning. We received your post-construction cleaning quote request. We'll assess your needs and get back to you shortly with a customized quote. Thank you!`;
+      const details = booking.details ? `\nProject Details: ${booking.details}` : '';
+      return `Hi ${clientName}! This is Shiny Path Cleaning. We received your post-construction cleaning quote request.
+
+Contact: ${booking.client_phone}
+Email: ${booking.client_email}
+Address: ${booking.client_address}${details}
+
+We'll assess your needs and get back to you shortly with a customized quote. Thank you!`;
     }
   };
 
