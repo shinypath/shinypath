@@ -245,20 +245,20 @@ We'll assess your needs and get back to you shortly with a customized quote. Tha
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" className="min-h-[44px] sm:min-h-0" asChild>
               <a href={`mailto:${booking.client_email}?subject=${encodeURIComponent(emailTemplate.subject)}&body=${encodeURIComponent(emailTemplate.body)}`}>
-                <Mail className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Email</span>
+                <Mail className="h-4 w-4 mr-2" />
+                <span>Email</span>
               </a>
             </Button>
             <Button variant="outline" size="sm" className="min-h-[44px] sm:min-h-0" asChild>
               <a href={`sms:${booking.client_phone}?body=${encodeURIComponent(smsTemplate)}`}>
-                <MessageSquare className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">SMS</span>
+                <MessageSquare className="h-4 w-4 mr-2" />
+                <span>SMS</span>
               </a>
             </Button>
             <Button variant="outline" size="sm" className="min-h-[44px] sm:min-h-0" asChild>
               <a href={`tel:${booking.client_phone}`}>
-                <Phone className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Call</span>
+                <Phone className="h-4 w-4 mr-2" />
+                <span>Call</span>
               </a>
             </Button>
           </div>
