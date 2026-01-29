@@ -202,7 +202,7 @@ We'll assess your needs and get back to you shortly with a customized quote. Tha
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto mx-4 sm:mx-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-4">
             <span className="font-tenor uppercase tracking-wide">Booking Details</span>
