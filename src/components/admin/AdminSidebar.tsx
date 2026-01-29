@@ -39,9 +39,15 @@ const menuItems = [
 
 export function AdminSidebar() {
   const { signOut } = useAuth();
-  const { state } = useSidebar();
+  const { state, setOpenMobile, isMobile } = useSidebar();
   const location = useLocation();
   const collapsed = state === 'collapsed';
+
+  const handleNavClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
   return (
     <Sidebar collapsible="icon" className="!bg-sidebar !border-sidebar-border">
@@ -71,6 +77,7 @@ export function AdminSidebar() {
                     <SidebarMenuButton asChild isActive={isActive} className="min-h-[44px]">
                       <NavLink 
                         to={item.url} 
+                        onClick={handleNavClick}
                         className={cn(
                           "flex items-center gap-3 text-white/90 hover:text-white hover:bg-white/10 py-3",
                           isActive && "bg-white/20 text-white"
