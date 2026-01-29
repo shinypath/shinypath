@@ -206,7 +206,7 @@ We'll assess your needs and get back to you shortly with a customized quote. Tha
         <DialogHeader>
           <DialogTitle className="flex items-center gap-4">
             <span className="font-tenor uppercase tracking-wide">Booking Details</span>
-            <Badge className={`${statusColors[booking.status]} font-ubuntu hover:bg-inherit cursor-default`}>
+            <Badge className={`${statusColors[booking.status]} font-ubuntu hover:bg-inherit cursor-default pointer-events-none`}>
               {booking.status}
             </Badge>
           </DialogTitle>

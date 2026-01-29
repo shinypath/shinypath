@@ -107,7 +107,7 @@ export function SwipeableSubmissionCard({
             <p className="font-medium truncate">{quote.client_name}</p>
             <p className="text-xs text-muted-foreground truncate">{quote.client_email}</p>
           </div>
-          <Badge className={`${statusColors[quote.status]} flex-shrink-0`}>
+          <Badge className={`${statusColors[quote.status]} flex-shrink-0 hover:bg-inherit cursor-default pointer-events-none`}>
             {quote.status}
           </Badge>
         </div>
