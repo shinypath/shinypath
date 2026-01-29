@@ -123,13 +123,6 @@ export function Summary({
           <span>{formatCurrency(calculation.subtotal)}</span>
         </div>
 
-        {/* Discount */}
-        {calculation.discountAmount > 0 && (
-          <div className="flex justify-between text-status-confirmed">
-            <span>Discount ({Math.round(calculation.discountPercent * 100)}%)</span>
-            <span>-{formatCurrency(calculation.discountAmount)}</span>
-          </div>
-        )}
 
         {/* Total */}
         <div className="flex justify-between text-xl font-bold text-primary pt-2 border-t border-border font-display">
