@@ -198,7 +198,9 @@ export default function PricingConfigPage() {
           </AccordionTrigger>
           <AccordionContent>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 py-4">
-              {Object.entries(config.kitchens).map(([qty, price]) => (
+              {Object.entries(config.kitchens)
+                .sort(([a], [b]) => parseFloat(a) - parseFloat(b))
+                .map(([qty, price]) => (
                 <div key={qty} className="space-y-2">
                   <Label>{qty} kitchen{qty !== '1' ? 's' : ''}</Label>
                   <div className="flex items-center gap-2">
@@ -223,7 +225,9 @@ export default function PricingConfigPage() {
           </AccordionTrigger>
           <AccordionContent>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 py-4">
-              {Object.entries(config.bathrooms).map(([qty, price]) => (
+              {Object.entries(config.bathrooms)
+                .sort(([a], [b]) => parseFloat(a) - parseFloat(b))
+                .map(([qty, price]) => (
                 <div key={qty} className="space-y-2">
                   <Label>{qty} bathroom{qty !== '1' ? 's' : ''}</Label>
                   <div className="flex items-center gap-2">
@@ -248,7 +252,9 @@ export default function PricingConfigPage() {
           </AccordionTrigger>
           <AccordionContent>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 py-4">
-              {Object.entries(config.bedrooms).map(([qty, price]) => (
+              {Object.entries(config.bedrooms)
+                .sort(([a], [b]) => parseFloat(a) - parseFloat(b))
+                .map(([qty, price]) => (
                 <div key={qty} className="space-y-2">
                   <Label>{qty} bedroom{qty !== '1' ? 's' : ''}</Label>
                   <div className="flex items-center gap-2">
@@ -273,7 +279,9 @@ export default function PricingConfigPage() {
           </AccordionTrigger>
           <AccordionContent>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 py-4">
-              {Object.entries(config.livingRooms).map(([qty, price]) => (
+              {Object.entries(config.livingRooms)
+                .sort(([a], [b]) => parseFloat(a) - parseFloat(b))
+                .map(([qty, price]) => (
                 <div key={qty} className="space-y-2">
                   <Label>{qty} living room{qty !== '1' ? 's' : ''}</Label>
                   <div className="flex items-center gap-2">
