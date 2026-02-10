@@ -35,11 +35,11 @@ function replaceTemplateVariables(template: string, quote: Quote, adminUrl?: str
     '{{client_address}}': quote.client_address || '',
     '{{cleaning_type}}': quote.cleaning_type || '',
     '{{frequency}}': quote.frequency || '',
-    '{{preferred_date}}': quote.preferred_date ? new Date(quote.preferred_date).toLocaleDateString('en-CA', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    '{{preferred_date}}': quote.preferred_date ? new Date(quote.preferred_date).toLocaleDateString('en-CA', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     }) : '',
     '{{preferred_time}}': quote.preferred_time || 'To be confirmed',
     '{{total}}': quote.total?.toFixed(2) || '0.00',
@@ -70,18 +70,18 @@ async function sendEmailViaResend(
   });
 
   const data = await response.json();
-  
+
   if (!response.ok) {
     console.error("Resend API error:", data);
     return { error: data.message || "Failed to send email" };
   }
-  
+
   return { id: data.id };
 }
 
 const handler = async (req: Request): Promise<Response> => {
   console.log("send-notification-email function called");
-  
+
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -96,13 +96,13 @@ const handler = async (req: Request): Promise<Response> => {
         { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
-    
+
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const { quote_id, notification_type, send_to_client = true, send_to_admin = true }: EmailRequest = await req.json();
-    
+
     console.log(`Processing ${notification_type} for quote ${quote_id}`);
 
     // Fetch quote details
@@ -167,7 +167,7 @@ const handler = async (req: Request): Promise<Response> => {
       const clientBody = replaceTemplateVariables(template.body_html, quote as Quote, adminUrl);
 
       console.log(`Sending client email to: ${quote.client_email}`);
-      
+
       const clientEmailResult = await sendEmailViaResend(
         resendApiKey,
         `${settings.from_name} <${settings.from_email}>`,
@@ -190,7 +190,7 @@ const handler = async (req: Request): Promise<Response> => {
           .select('*')
           .eq('template_type', 'admin_new_booking')
           .single();
-        
+
         if (adminNotifTemplate && notification_type === 'appointment_created') {
           adminTemplate = adminNotifTemplate;
         }
@@ -199,13 +199,13 @@ const handler = async (req: Request): Promise<Response> => {
       const adminSubject = notification_type === 'admin_new_booking' || notification_type === 'appointment_created'
         ? replaceTemplateVariables(adminTemplate.subject, quote as Quote)
         : `[Admin] ${replaceTemplateVariables(template.subject, quote as Quote)}`;
-      
+
       const adminBody = notification_type === 'admin_new_booking' || notification_type === 'appointment_created'
         ? replaceTemplateVariables(adminTemplate.body_html, quote as Quote, adminUrl)
         : replaceTemplateVariables(template.body_html, quote as Quote, adminUrl);
 
       console.log(`Sending admin email to: ${settings.admin_email}`);
-      
+
       const adminEmailResult = await sendEmailViaResend(
         resendApiKey,
         `${settings.from_name} <${settings.from_email}>`,
@@ -223,10 +223,10 @@ const handler = async (req: Request): Promise<Response> => {
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error in send-notification-email:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
       { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }

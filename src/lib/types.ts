@@ -1,7 +1,7 @@
 // Shiny Path Cleaning - Type Definitions
 
 export type QuoteStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled';
-export type CleaningFormType = 'house' | 'office' | 'post-construction';
+export type CleaningFormType = 'house' | 'office' | 'post-construction' | 'contact';
 
 export interface CleaningQuote {
   id: string;
@@ -62,6 +62,13 @@ export interface PostConstructionFormData {
   email: string;
   phone: string;
   details: string;
+}
+
+export interface ContactFormData {
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
 }
 
 export interface CalculatedPrice {

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
-import { User, Session } from '@supabase/supabase-js';
+import { User, Session, AuthError } from '@supabase/supabase-js';
 
 interface AuthContextType {
   user: User | null;
@@ -8,9 +8,9 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   isAdmin: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string) => Promise<{ error: any }>;
-  signOut: () => Promise<{ error: any }>;
+  signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
+  signUp: (email: string, password: string) => Promise<{ error: AuthError | null }>;
+  signOut: () => Promise<{ error: AuthError | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -29,21 +29,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isAuthenticated = !!user && !!session;
 
   return (
-    <AuthContext.Provider value={{ 
+    <AuthContext.Provider value={{
       user,
       session,
-      isAuthenticated, 
-      isLoading: loading, 
+      isAuthenticated,
+      isLoading: loading,
       isAdmin,
-      signIn, 
+      signIn,
       signUp,
-      signOut 
+      signOut
     }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {

@@ -11,7 +11,7 @@ export default function AdminLayout() {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      navigate('/auth');
+      navigate('/jhosso');
     }
   }, [isAuthenticated, isLoading, navigate]);
 

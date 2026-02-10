@@ -32,11 +32,13 @@ export function Summary({
   const freqLabel = freqConfig?.label ?? frequency;
   const discountPercent = freqConfig?.discount ?? 0;
 
+  const hasRooms = kitchens > 0 || Number(bathrooms) > 0 || Number(bedrooms) > 0 || livingRooms > 0;
+
   return (
     <div className="calculator-panel lg:sticky lg:top-4 shadow-md lg:shadow-sm">
       <div className="flex items-center gap-2 mb-4">
         <Sparkles className="w-5 h-5 text-primary" />
-        <h3 className="font-display text-base sm:text-lg uppercase tracking-wide">Your Quote</h3>
+        <h3 className="font-display text-base sm:text-lg uppercase tracking-wide">SUMMARY</h3>
       </div>
 
       <div className="space-y-3 text-sm">
@@ -80,7 +82,7 @@ export function Summary({
           </div>
         )}
 
-        {livingRooms > 0 && calculation.livingRoomPrice > 0 && (
+        {livingRooms > 0 && (
           <div className="flex justify-between">
             <span>Living Room ({livingRooms})</span>
             <span>{formatCurrency(calculation.livingRoomPrice)}</span>
@@ -90,7 +92,7 @@ export function Summary({
         {/* Extras */}
         {extras.length > 0 && (
           <>
-            <hr className="border-border" />
+            {hasRooms && <hr className="border-border" />}
             {extras.map((extra) => {
               const extraConfig = pricing.extras[extra as keyof typeof pricing.extras];
               if (!extraConfig) return null;
@@ -107,7 +109,7 @@ export function Summary({
         {/* Laundry */}
         {laundry > 0 && (
           <>
-            <hr className="border-border" />
+            {(hasRooms || extras.length > 0) && <hr className="border-border" />}
             <div className="flex justify-between">
               <span>Laundry ({laundry} person{laundry > 1 ? 's' : ''})</span>
               <span>{formatCurrency(calculation.laundryPrice)}</span>
@@ -115,7 +117,7 @@ export function Summary({
           </>
         )}
 
-        <hr className="border-border" />
+        {(hasRooms || extras.length > 0 || laundry > 0) && <hr className="border-border" />}
 
         {/* Subtotal */}
         <div className="flex justify-between font-medium">

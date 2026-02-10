@@ -3,7 +3,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HouseCleaningForm } from "@/components/forms/HouseCleaningForm";
 import { OfficeCleaningForm } from "@/components/forms/OfficeCleaningForm";
 import { PostConstructionForm } from "@/components/forms/PostConstructionForm";
-import { Home, Building2, HardHat, Eye } from "lucide-react";
+import { ContactForm } from "@/components/forms/ContactForm";
+import { Home, Building2, HardHat, Eye, MessageSquare } from "lucide-react";
 
 export default function FormsPage() {
   const [activeTab, setActiveTab] = useState("house");
@@ -20,7 +21,7 @@ export default function FormsPage() {
 
       <div className="bg-background/50 rounded-lg border p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-3 mb-8">
+          <TabsList className="grid w-full max-w-2xl grid-cols-4 mb-8">
             <TabsTrigger value="house" className="flex items-center gap-2">
               <Home className="w-4 h-4" />
               <span className="hidden sm:inline">House</span>
@@ -33,6 +34,10 @@ export default function FormsPage() {
               <HardHat className="w-4 h-4" />
               <span className="hidden sm:inline">Post-Const.</span>
             </TabsTrigger>
+            <TabsTrigger value="contact" className="flex items-center gap-2">
+              <MessageSquare className="w-4 h-4" />
+              <span className="hidden sm:inline">Contact</span>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="house">
@@ -43,6 +48,9 @@ export default function FormsPage() {
           </TabsContent>
           <TabsContent value="post-construction">
             <PostConstructionForm />
+          </TabsContent>
+          <TabsContent value="contact">
+            <ContactForm />
           </TabsContent>
         </Tabs>
       </div>

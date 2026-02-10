@@ -11,16 +11,16 @@ import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { useEmailSettings, EmailTemplate } from '@/hooks/useEmailSettings';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  Mail, 
-  Settings, 
-  FileText, 
-  Bell, 
-  Clock, 
-  Send, 
-  Eye, 
-  Edit2, 
-  Save, 
+import {
+  Mail,
+  Settings,
+  FileText,
+  Bell,
+  Clock,
+  Send,
+  Eye,
+  Edit2,
+  Save,
   Loader2,
   CheckCircle,
   XCircle,
@@ -59,11 +59,11 @@ const templateTypeLabels: Record<string, { label: string; description: string; i
 export default function EmailSettingsPage() {
   const { toast } = useToast();
   const { templates, settings, loading, updateTemplate, updateSettings, refresh } = useEmailSettings();
-  
+
   const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null);
   const [previewTemplate, setPreviewTemplate] = useState<EmailTemplate | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  
+
   // Local form state for settings
   const [settingsForm, setSettingsForm] = useState({
     admin_email: '',
@@ -93,8 +93,8 @@ export default function EmailSettingsPage() {
     try {
       await updateSettings(settingsForm);
       toast({ title: 'Settings saved', description: 'Email settings updated successfully.' });
-    } catch (err: any) {
-      toast({ variant: 'destructive', title: 'Error', description: err.message });
+    } catch (err: unknown) {
+      toast({ variant: 'destructive', title: 'Error', description: err instanceof Error ? err.message : 'Unknown error' });
     } finally {
       setIsSaving(false);
     }
@@ -103,18 +103,18 @@ export default function EmailSettingsPage() {
   const handleToggleTemplate = async (template: EmailTemplate) => {
     try {
       await updateTemplate(template.id, { enabled: !template.enabled });
-      toast({ 
+      toast({
         title: template.enabled ? 'Template disabled' : 'Template enabled',
         description: `${templateTypeLabels[template.template_type]?.label} notifications are now ${template.enabled ? 'disabled' : 'enabled'}.`
       });
-    } catch (err: any) {
-      toast({ variant: 'destructive', title: 'Error', description: err.message });
+    } catch (err: unknown) {
+      toast({ variant: 'destructive', title: 'Error', description: err instanceof Error ? err.message : 'Unknown error' });
     }
   };
 
   const handleSaveTemplate = async () => {
     if (!editingTemplate) return;
-    
+
     setIsSaving(true);
     try {
       await updateTemplate(editingTemplate.id, {
@@ -123,8 +123,8 @@ export default function EmailSettingsPage() {
       });
       toast({ title: 'Template saved', description: 'Email template updated successfully.' });
       setEditingTemplate(null);
-    } catch (err: any) {
-      toast({ variant: 'destructive', title: 'Error', description: err.message });
+    } catch (err: unknown) {
+      toast({ variant: 'destructive', title: 'Error', description: err instanceof Error ? err.message : 'Unknown error' });
     } finally {
       setIsSaving(false);
     }
@@ -196,53 +196,53 @@ export default function EmailSettingsPage() {
                     description: '',
                     icon: <Mail className="h-4 w-4" />,
                   };
-                  
-                    return (
-                      <div
-                        key={template.id}
-                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-3 sm:p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                      >
-                        <div className="flex items-start gap-3 sm:gap-4">
-                          <div className={`p-2 rounded-lg flex-shrink-0 ${template.enabled ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
-                            {info.icon}
-                          </div>
-                          <div className="min-w-0">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <h4 className="font-medium text-sm sm:text-base">{info.label}</h4>
-                              <Badge variant={template.enabled ? 'default' : 'secondary'} className="text-xs">
-                                {template.enabled ? 'Active' : 'Disabled'}
-                              </Badge>
-                            </div>
-                            <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">{info.description}</p>
-                            <p className="text-xs text-muted-foreground mt-1 truncate">
-                              Subject: {template.subject.substring(0, 30)}...
-                            </p>
-                          </div>
+
+                  return (
+                    <div
+                      key={template.id}
+                      className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-3 sm:p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="flex items-start gap-3 sm:gap-4">
+                        <div className={`p-2 rounded-lg flex-shrink-0 ${template.enabled ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                          {info.icon}
                         </div>
-                        <div className="flex items-center gap-2 self-end sm:self-auto">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-9 w-9 p-0"
-                            onClick={() => setPreviewTemplate(template)}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-9 w-9 p-0"
-                            onClick={() => setEditingTemplate({ ...template })}
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </Button>
-                          <Switch
-                            checked={template.enabled}
-                            onCheckedChange={() => handleToggleTemplate(template)}
-                          />
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h4 className="font-medium text-sm sm:text-base">{info.label}</h4>
+                            <Badge variant={template.enabled ? 'default' : 'secondary'} className="text-xs">
+                              {template.enabled ? 'Active' : 'Disabled'}
+                            </Badge>
+                          </div>
+                          <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">{info.description}</p>
+                          <p className="text-xs text-muted-foreground mt-1 truncate">
+                            Subject: {template.subject.substring(0, 30)}...
+                          </p>
                         </div>
                       </div>
-                    );
+                      <div className="flex items-center gap-2 self-end sm:self-auto">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-9 w-9 p-0"
+                          onClick={() => setPreviewTemplate(template)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-9 w-9 p-0"
+                          onClick={() => setEditingTemplate({ ...template })}
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </Button>
+                        <Switch
+                          checked={template.enabled}
+                          onCheckedChange={() => handleToggleTemplate(template)}
+                        />
+                      </div>
+                    </div>
+                  );
                 })
               )}
             </CardContent>
@@ -601,7 +601,7 @@ export default function EmailSettingsPage() {
               <div className="bg-muted p-2 rounded">
                 <strong>Subject:</strong> {previewTemplate.subject}
               </div>
-              <div 
+              <div
                 className="border rounded-lg p-4 bg-white"
                 dangerouslySetInnerHTML={{ __html: previewTemplate.body_html }}
               />

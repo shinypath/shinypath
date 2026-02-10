@@ -12,10 +12,13 @@ interface Errors {
   [key: string]: string;
 }
 
+import { SuccessModal } from "../modals/SuccessModal";
+
 export function OfficeCleaningForm() {
   const { toast } = useToast();
   const { createQuote } = useQuotes();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
 
   const [formData, setFormData] = useState<OfficeCleaningFormData>({
@@ -49,7 +52,7 @@ export function OfficeCleaningForm() {
     }
     if (!formData.phone.trim()) {
       newErrors.phone = "Phone is required";
-    } else if (!/^[\d\s\-\(\)\+]{7,20}$/.test(formData.phone)) {
+    } else if (!/^[\d\s\-()+]{7,20}$/.test(formData.phone)) {
       newErrors.phone = "Invalid phone number";
     }
 
@@ -95,10 +98,7 @@ export function OfficeCleaningForm() {
         status: "pending",
       });
 
-      toast({
-        title: "Quote Request Submitted!",
-        description: "We'll contact you shortly with a custom quote.",
-      });
+      setShowSuccessModal(true);
 
       setFormData({
         name: "",
@@ -120,90 +120,79 @@ export function OfficeCleaningForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="animate-fade-in max-w-2xl mx-auto bg-card rounded-lg border p-6">
-      <div className="bg-card rounded-lg border p-6 mb-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-primary/10 rounded-lg">
-            <Building2 className="w-6 h-6 text-primary" />
-          </div>
-          <div>
-            <h3 className="font-display text-lg uppercase tracking-wide">Office Cleaning</h3>
-            <p className="text-sm text-muted-foreground">Custom quotes based on your needs</p>
-          </div>
-        </div>
-        <p className="text-sm text-muted-foreground">
-          Office cleaning requires a custom assessment. Fill out the form below and we'll 
-          contact you to discuss your specific needs and provide a tailored quote.
-        </p>
-      </div>
+    <>
+      <SuccessModal open={showSuccessModal} onOpenChange={setShowSuccessModal} />
+      <form onSubmit={handleSubmit} className="animate-fade-in max-w-2xl mx-auto bg-card rounded-lg border p-6">
+        <h2 className="text-xl font-semibold text-[#283D8F] mb-6">Office Cleaning</h2>
 
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <FormLabel required>Contact Name</FormLabel>
-          <FormInput
-            placeholder="Your full name"
-            value={formData.name}
-            onChange={e => updateField("name", e.target.value)}
-            error={errors.name}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <FormLabel>Company Name</FormLabel>
-          <FormInput
-            placeholder="Your company name (optional)"
-            value={formData.company}
-            onChange={e => updateField("company", e.target.value)}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <FormLabel required>Office Address</FormLabel>
-          <FormInput
-            placeholder="123 Business St, Suite 100, City"
-            value={formData.address}
-            onChange={e => updateField("address", e.target.value)}
-            error={errors.address}
-          />
-        </div>
-
-        <div className="grid sm:grid-cols-2 gap-4">
+        <div className="space-y-4">
           <div className="space-y-2">
-            <FormLabel required>Email</FormLabel>
+            <FormLabel required>Contact Name</FormLabel>
             <FormInput
-              type="email"
-              placeholder="you@company.com"
-              value={formData.email}
-              onChange={e => updateField("email", e.target.value)}
-              error={errors.email}
+              placeholder="Your full name"
+              value={formData.name}
+              onChange={e => updateField("name", e.target.value)}
+              error={errors.name}
             />
           </div>
+
           <div className="space-y-2">
-            <FormLabel required>Phone</FormLabel>
+            <FormLabel>Company Name</FormLabel>
             <FormInput
-              type="tel"
-              placeholder="(555) 123-4567"
-              value={formData.phone}
-              onChange={e => updateField("phone", e.target.value)}
-              error={errors.phone}
+              placeholder="Your company name (optional)"
+              value={formData.company}
+              onChange={e => updateField("company", e.target.value)}
             />
           </div>
-        </div>
 
-        <div className="space-y-2">
-          <FormLabel>Details About Your Office</FormLabel>
-          <FormTextarea
-            placeholder="Please describe your office space: approximate size, number of rooms, any special requirements..."
-            value={formData.details}
-            onChange={e => updateField("details", e.target.value)}
-          />
-        </div>
+          <div className="space-y-2">
+            <FormLabel required>Office Address</FormLabel>
+            <FormInput
+              placeholder="123 Business St, Suite 100, City"
+              value={formData.address}
+              onChange={e => updateField("address", e.target.value)}
+              error={errors.address}
+            />
+          </div>
 
-        <Button type="submit" className="w-full h-12 text-base" disabled={isSubmitting}>
-          {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {isSubmitting ? "Submitting..." : "Request Custom Quote"}
-        </Button>
-      </div>
-    </form>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <FormLabel required>Email</FormLabel>
+              <FormInput
+                type="email"
+                placeholder="you@company.com"
+                value={formData.email}
+                onChange={e => updateField("email", e.target.value)}
+                error={errors.email}
+              />
+            </div>
+            <div className="space-y-2">
+              <FormLabel required>Phone</FormLabel>
+              <FormInput
+                type="tel"
+                placeholder="(555) 123-4567"
+                value={formData.phone}
+                onChange={e => updateField("phone", e.target.value)}
+                error={errors.phone}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <FormLabel>Details About Your Office</FormLabel>
+            <FormTextarea
+              placeholder="Please describe your office space: approximate size, number of rooms, any special requirements..."
+              value={formData.details}
+              onChange={e => updateField("details", e.target.value)}
+            />
+          </div>
+
+          <Button type="submit" className="w-full h-12 text-base" disabled={isSubmitting}>
+            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isSubmitting ? "Submitting..." : "Request Custom Quote"}
+          </Button>
+        </div>
+      </form>
+    </>
   );
 }

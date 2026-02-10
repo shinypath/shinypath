@@ -34,6 +34,12 @@ export function setSupabaseConfig(url: string, anonKey: string) {
 export const supabaseConfig = readConfig();
 export const hasSupabaseConfig = !!(supabaseConfig.url && supabaseConfig.anonKey);
 
+console.log('Supabase Config Debug:', {
+  url: supabaseConfig.url,
+  hasAnonKey: !!supabaseConfig.anonKey,
+  usingDefault: supabaseConfig.url === DEFAULT_SUPABASE_URL
+});
+
 // IMPORTANT: we don't throw here to avoid a blank screen.
 // When config is missing, main.tsx renders a setup screen instead.
 export const supabase = hasSupabaseConfig

@@ -1,0 +1,29 @@
+{
+    "name": "Shiny Path Cleaning",
+    "short_name": "Shiny Path",
+    "description": "Shiny Path Cleaning - Professional Cleaning Services",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#283D8F",
+    "theme_color": "#283D8F",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/app-icon.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/apple-touch-icon.png",
+            "sizes": "180x180",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/favicon.ico",
+            "sizes": "48x48",
+            "type": "image/x-icon"
+        }
+    ]
+}

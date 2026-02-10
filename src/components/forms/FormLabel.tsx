@@ -10,7 +10,7 @@ export const FormLabel = React.forwardRef<HTMLLabelElement, FormLabelProps>(
     return (
       <label
         ref={ref}
-        className={cn("text-sm font-medium text-foreground", className)}
+        className={cn("text-sm font-medium text-[#283D8F]", className)}
         {...props}
       >
         {children}

@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import QuoteRequest from "./pages/QuoteRequest";
+import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import AuthPage from "./pages/auth/AuthPage";
 import AdminLayout from "./layouts/AdminLayout";
@@ -29,11 +30,12 @@ const App = () => (
             {/* Public Routes */}
             <Route path="/" element={<QuoteRequest />} />
             <Route path="/quote-request" element={<QuoteRequest />} />
-            
+            <Route path="/contact" element={<Contact />} />
+
             {/* Auth */}
-            <Route path="/auth" element={<AuthPage />} />
-            <Route path="/admin/login" element={<Navigate to="/auth" replace />} />
-            
+            <Route path="/jhosso" element={<AuthPage />} />
+            <Route path="/admin/login" element={<Navigate to="/jhosso" replace />} />
+
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
@@ -44,7 +46,7 @@ const App = () => (
               <Route path="emails" element={<EmailSettingsPage />} />
               <Route path="settings" element={<SettingsPage />} />
             </Route>
-            
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

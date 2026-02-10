@@ -59,23 +59,26 @@ const TIME_SLOTS = [
   { value: "18:00", label: "6:00 PM" },
 ];
 
+import { SuccessModal } from "../modals/SuccessModal";
+
 export function HouseCleaningForm() {
   const { toast } = useToast();
   const pricing = getPricing();
   const { createQuote } = useQuotes();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [timeOpen, setTimeOpen] = useState(false);
   const { getBookedTimesForDate, isDateFullyBooked, getDateAvailability, getAvailableSlotsCount, loading: loadingSlots } = useBookedSlots();
-  
+
   const [formData, setFormData] = useState<HouseCleaningFormData>({
     cleaningType: "standard",
     frequency: "one-time",
-    kitchens: 1,
-    bathrooms: "1",
-    bedrooms: "1",
-    livingRooms: 1,
+    kitchens: 0,
+    bathrooms: "0",
+    bedrooms: "0",
+    livingRooms: 0,
     extras: [],
     laundry: 0,
     date: "",
@@ -96,7 +99,7 @@ export function HouseCleaningForm() {
   // Get available time slots for the selected date
   const availableTimeSlots = useMemo(() => {
     if (!formData.date) return TIME_SLOTS;
-    
+
     const bookedTimes = getBookedTimesForDate(formData.date);
     return TIME_SLOTS.filter(slot => !bookedTimes.includes(slot.value));
   }, [formData.date, getBookedTimesForDate]);
@@ -143,7 +146,7 @@ export function HouseCleaningForm() {
     }
     if (!formData.phone.trim()) {
       newErrors.phone = "Phone is required";
-    } else if (!/^[\d\s\-\(\)\+]{7,20}$/.test(formData.phone)) {
+    } else if (!/^[\d\s\-()+]{7,20}$/.test(formData.phone)) {
       newErrors.phone = "Invalid phone number";
     }
     if (!formData.date) newErrors.date = "Date is required";
@@ -191,19 +194,16 @@ export function HouseCleaningForm() {
         status: "pending",
       });
 
-      toast({
-        title: "Quote Submitted!",
-        description: "We'll get back to you shortly with confirmation.",
-      });
+      setShowSuccessModal(true);
 
       // Reset form
       setFormData({
         cleaningType: "standard",
         frequency: "one-time",
-        kitchens: 1,
-        bathrooms: "1",
-        bedrooms: "1",
-        livingRooms: 1,
+        kitchens: 0,
+        bathrooms: "0",
+        bedrooms: "0",
+        livingRooms: 0,
         extras: [],
         laundry: 0,
         date: "",
@@ -231,258 +231,157 @@ export function HouseCleaningForm() {
   }));
 
   return (
-    <form onSubmit={handleSubmit} className="animate-fade-in">
-      <div className="grid lg:grid-cols-[1fr,320px] gap-8">
-        {/* Form Fields */}
-        <div className="space-y-6 bg-card rounded-lg border p-6">
-          {/* Type of Cleaning */}
-          <div className="space-y-2">
-            <FormLabel required>Type of Cleaning</FormLabel>
-            <FormSelect
-              value={formData.cleaningType}
-              onChange={e => updateField("cleaningType", e.target.value)}
-              options={typeOptions}
-            />
-          </div>
-
-          {/* Frequency */}
-          <div className="space-y-3">
-            <FormLabel required>Frequency</FormLabel>
-            <div className="grid sm:grid-cols-2 gap-3">
-              {Object.entries(pricing.frequencies).map(([value, { label, discount }]) => (
-                <FrequencyCheckbox
-                  key={value}
-                  value={value}
-                  label={label}
-                  discountLabel={discount > 0 ? `${Math.round(discount * 100)}% off` : undefined}
-                  checked={formData.frequency === value}
-                  onChange={(val) => updateField("frequency", val)}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Rooms Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+    <>
+      <SuccessModal open={showSuccessModal} onOpenChange={setShowSuccessModal} />
+      <form onSubmit={handleSubmit} className="animate-fade-in">
+        <div className="grid lg:grid-cols-[3fr,2fr] gap-8">
+          {/* Form Fields */}
+          <div className="space-y-6 bg-card rounded-lg border p-6">
+            <h2 className="text-xl font-semibold text-[#283D8F]">House Cleaning</h2>
+            {/* Type of Cleaning */}
             <div className="space-y-2">
-              <FormLabel>Kitchen</FormLabel>
+              <FormLabel required>Type of Cleaning</FormLabel>
               <FormSelect
-                value={String(formData.kitchens)}
-                onChange={e => updateField("kitchens", Number(e.target.value))}
-                options={KITCHEN_OPTIONS}
+                value={formData.cleaningType}
+                onChange={e => updateField("cleaningType", e.target.value)}
+                options={typeOptions}
               />
             </div>
-            <div className="space-y-2">
-              <FormLabel>Bathroom</FormLabel>
-              <FormSelect
-                value={formData.bathrooms}
-                onChange={e => updateField("bathrooms", e.target.value)}
-                options={BATHROOM_OPTIONS}
-              />
-            </div>
-            <div className="space-y-2">
-              <FormLabel>Bedroom</FormLabel>
-              <FormSelect
-                value={formData.bedrooms}
-                onChange={e => updateField("bedrooms", e.target.value)}
-                options={BEDROOM_OPTIONS}
-              />
-            </div>
-            <div className="space-y-2">
-              <FormLabel>Living Room</FormLabel>
-              <FormSelect
-                value={String(formData.livingRooms)}
-                onChange={e => updateField("livingRooms", Number(e.target.value))}
-                options={LIVING_ROOM_OPTIONS}
-              />
-            </div>
-          </div>
 
-          {/* Extras */}
-          <div className="space-y-3">
-            <FormLabel>Extras</FormLabel>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
-              <ExtraToggle
-                value="inside-fridge"
-                label="Inside Fridge"
-                price={formatCurrency(pricing.extras["inside-fridge"].price)}
-                icon={<FridgeIcon className="w-6 h-6" />}
-                checked={formData.extras.includes("inside-fridge")}
-                onChange={toggleExtra}
-              />
-              <ExtraToggle
-                value="inside-oven"
-                label="Inside Oven"
-                price={formatCurrency(pricing.extras["inside-oven"].price)}
-                icon={<OvenIcon className="w-6 h-6" />}
-                checked={formData.extras.includes("inside-oven")}
-                onChange={toggleExtra}
-              />
-              <ExtraToggle
-                value="inside-cabinets"
-                label="Inside Cabinets"
-                price={formatCurrency(pricing.extras["inside-cabinets"].price)}
-                icon={<CabinetsIcon className="w-6 h-6" />}
-                checked={formData.extras.includes("inside-cabinets")}
-                onChange={toggleExtra}
-              />
-              <ExtraToggle
-                value="dishes"
-                label="Dishes"
-                price={formatCurrency(pricing.extras["dishes"].price)}
-                icon={<DishesIcon className="w-6 h-6" />}
-                checked={formData.extras.includes("dishes")}
-                onChange={toggleExtra}
-              />
-              <ExtraToggle
-                value="pets"
-                label="Pets"
-                price={formatCurrency(pricing.extras["pets"].price)}
-                icon={<PetsIcon className="w-6 h-6" />}
-                checked={formData.extras.includes("pets")}
-                onChange={toggleExtra}
-              />
-            </div>
-          </div>
-
-          {/* Laundry */}
-          <div className="space-y-2">
-            <FormLabel>Laundry & Folding</FormLabel>
-            <FormSelect
-              value={String(formData.laundry)}
-              onChange={e => updateField("laundry", Number(e.target.value))}
-              options={LAUNDRY_OPTIONS}
-            />
-            {formData.laundry > 0 && (
-              <p className="text-xs text-muted-foreground">
-                +{formatCurrency(pricing.laundryPerPerson)} per person
-              </p>
-            )}
-          </div>
-
-          {/* Date and Time */}
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <FormLabel required>Preferred Date</FormLabel>
-              <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal h-10",
-                      !formData.date && "text-muted-foreground",
-                      errors.date && "border-destructive"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {formData.date ? format(new Date(formData.date + "T12:00:00"), "PPP") : "Pick a date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <div className="p-3 border-b">
-                    <div className="flex items-center gap-4 text-xs">
-                      <div className="flex items-center gap-1.5">
-                        <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                        <span>Available</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <div className="w-3 h-3 rounded-full bg-amber-500" />
-                        <span>Limited</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <div className="w-3 h-3 rounded-full bg-destructive" />
-                        <span>Full</span>
-                      </div>
-                    </div>
-                  </div>
-                  <Calendar
-                    mode="single"
-                    selected={formData.date ? new Date(formData.date + "T12:00:00") : undefined}
-                    onSelect={(date) => {
-                      if (date) {
-                        const dateStr = format(date, "yyyy-MM-dd");
-                        updateField("date", dateStr);
-                        updateField("time", ""); // Clear time to force re-selection
-                      }
-                      setCalendarOpen(false);
-                    }}
-                    disabled={(date) => {
-                      const today = new Date();
-                      today.setHours(0, 0, 0, 0);
-                      if (date < today) return true;
-                      const dateStr = format(date, "yyyy-MM-dd");
-                      return isDateFullyBooked(dateStr);
-                    }}
-                    modifiers={{
-                      available: (date) => {
-                        const today = new Date();
-                        today.setHours(0, 0, 0, 0);
-                        if (date < today) return false;
-                        const dateStr = format(date, "yyyy-MM-dd");
-                        return getDateAvailability(dateStr) === 'available';
-                      },
-                      limited: (date) => {
-                        const today = new Date();
-                        today.setHours(0, 0, 0, 0);
-                        if (date < today) return false;
-                        const dateStr = format(date, "yyyy-MM-dd");
-                        return getDateAvailability(dateStr) === 'limited';
-                      },
-                      full: (date) => {
-                        const today = new Date();
-                        today.setHours(0, 0, 0, 0);
-                        if (date < today) return false;
-                        const dateStr = format(date, "yyyy-MM-dd");
-                        return getDateAvailability(dateStr) === 'full';
-                      },
-                    }}
-                    modifiersClassNames={{
-                      available: "!bg-emerald-500/20 hover:!bg-emerald-500/30 !text-emerald-700 dark:!text-emerald-300",
-                      limited: "!bg-amber-500/20 hover:!bg-amber-500/30 !text-amber-700 dark:!text-amber-300",
-                      full: "!bg-destructive/20 !text-destructive !opacity-50 !cursor-not-allowed",
-                    }}
-                    className="p-3 pointer-events-auto"
-                    initialFocus
+            {/* Frequency */}
+            <div className="space-y-3">
+              <FormLabel required>Frequency</FormLabel>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {Object.entries(pricing.frequencies).map(([value, { label, discount }]) => (
+                  <FrequencyCheckbox
+                    key={value}
+                    value={value}
+                    label={label}
+                    discountLabel={discount > 0 ? `${Math.round(discount * 100)}% off` : undefined}
+                    checked={formData.frequency === value}
+                    onChange={(val) => updateField("frequency", val)}
                   />
-                </PopoverContent>
-              </Popover>
-              {errors.date && (
-                <p className="text-xs text-destructive">{errors.date}</p>
-              )}
-              {formData.date && (
+                ))}
+              </div>
+            </div>
+
+            {/* Rooms Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+              <div className="space-y-2">
+                <FormLabel>Kitchen</FormLabel>
+                <FormSelect
+                  value={String(formData.kitchens)}
+                  onChange={e => updateField("kitchens", Number(e.target.value))}
+                  options={KITCHEN_OPTIONS}
+                />
+              </div>
+              <div className="space-y-2">
+                <FormLabel>Bathroom</FormLabel>
+                <FormSelect
+                  value={formData.bathrooms}
+                  onChange={e => updateField("bathrooms", e.target.value)}
+                  options={BATHROOM_OPTIONS}
+                />
+              </div>
+              <div className="space-y-2">
+                <FormLabel>Bedroom</FormLabel>
+                <FormSelect
+                  value={formData.bedrooms}
+                  onChange={e => updateField("bedrooms", e.target.value)}
+                  options={BEDROOM_OPTIONS}
+                />
+              </div>
+              <div className="space-y-2">
+                <FormLabel>Living Room</FormLabel>
+                <FormSelect
+                  value={String(formData.livingRooms)}
+                  onChange={e => updateField("livingRooms", Number(e.target.value))}
+                  options={LIVING_ROOM_OPTIONS}
+                />
+              </div>
+            </div>
+
+            {/* Extras */}
+            <div className="space-y-3">
+              <FormLabel>Extras</FormLabel>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
+                <ExtraToggle
+                  value="inside-fridge"
+                  label="Inside Fridge"
+                  price={formatCurrency(pricing.extras["inside-fridge"].price)}
+                  icon={<FridgeIcon className="w-6 h-6" />}
+                  checked={formData.extras.includes("inside-fridge")}
+                  onChange={toggleExtra}
+                />
+                <ExtraToggle
+                  value="inside-oven"
+                  label="Inside Oven"
+                  price={formatCurrency(pricing.extras["inside-oven"].price)}
+                  icon={<OvenIcon className="w-6 h-6" />}
+                  checked={formData.extras.includes("inside-oven")}
+                  onChange={toggleExtra}
+                />
+                <ExtraToggle
+                  value="inside-cabinets"
+                  label="Inside Cabinets"
+                  price={formatCurrency(pricing.extras["inside-cabinets"].price)}
+                  icon={<CabinetsIcon className="w-6 h-6" />}
+                  checked={formData.extras.includes("inside-cabinets")}
+                  onChange={toggleExtra}
+                />
+                <ExtraToggle
+                  value="dishes"
+                  label="Dishes"
+                  price={formatCurrency(pricing.extras["dishes"].price)}
+                  icon={<DishesIcon className="w-6 h-6" />}
+                  checked={formData.extras.includes("dishes")}
+                  onChange={toggleExtra}
+                />
+                <ExtraToggle
+                  value="pets"
+                  label="Pets"
+                  price={formatCurrency(pricing.extras["pets"].price)}
+                  icon={<PetsIcon className="w-6 h-6" />}
+                  checked={formData.extras.includes("pets")}
+                  onChange={toggleExtra}
+                />
+              </div>
+            </div>
+
+            {/* Laundry */}
+            <div className="space-y-2">
+              <FormLabel>Laundry & Folding</FormLabel>
+              <FormSelect
+                value={String(formData.laundry)}
+                onChange={e => updateField("laundry", Number(e.target.value))}
+                options={LAUNDRY_OPTIONS}
+              />
+              {formData.laundry > 0 && (
                 <p className="text-xs text-muted-foreground">
-                  {getAvailableSlotsCount(formData.date)} time slots available
+                  +{formatCurrency(pricing.laundryPerPerson)} per person
                 </p>
               )}
             </div>
-            <div className="space-y-2">
-              <FormLabel required>Preferred Time</FormLabel>
-              {loadingSlots ? (
-                <div className="flex items-center h-10 px-3 border rounded-md bg-muted/50 text-muted-foreground text-sm">
-                  Loading available times...
-                </div>
-              ) : !formData.date ? (
-                <div className="flex items-center h-10 px-3 border rounded-md bg-muted/50 text-muted-foreground text-sm">
-                  Select a date first
-                </div>
-              ) : (
-                <Popover open={timeOpen} onOpenChange={setTimeOpen}>
+
+            {/* Date and Time */}
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <FormLabel required>Preferred Date</FormLabel>
+                <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
                       className={cn(
                         "w-full justify-start text-left font-normal h-10",
-                        !formData.time && "text-muted-foreground",
-                        errors.time && "border-destructive"
+                        !formData.date && "text-muted-foreground",
+                        errors.date && "border-destructive"
                       )}
                     >
-                      <Clock className="mr-2 h-4 w-4" />
-                      {formData.time 
-                        ? TIME_SLOTS.find(s => s.value === formData.time)?.label 
-                        : "Pick a time"}
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {formData.date ? format(new Date(formData.date + "T12:00:00"), "PPP") : "Pick a date"}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-64 p-0" align="start">
+                  <PopoverContent className="w-auto p-0" align="start">
                     <div className="p-3 border-b">
                       <div className="flex items-center gap-4 text-xs">
                         <div className="flex items-center gap-1.5">
@@ -490,102 +389,227 @@ export function HouseCleaningForm() {
                           <span>Available</span>
                         </div>
                         <div className="flex items-center gap-1.5">
+                          <div className="w-3 h-3 rounded-full bg-amber-500" />
+                          <span>Limited</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
                           <div className="w-3 h-3 rounded-full bg-destructive" />
-                          <span>Booked</span>
+                          <span>Full</span>
                         </div>
                       </div>
                     </div>
-                    <div className="p-3 grid grid-cols-2 gap-2 max-h-64 overflow-y-auto pointer-events-auto">
-                      {TIME_SLOTS.map((slot) => {
-                        const isBooked = bookedTimesForDate.has(slot.value);
-                        const isSelected = formData.time === slot.value;
-                        
-                        return (
-                          <Button
-                            key={slot.value}
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            disabled={isBooked}
-                            onClick={() => {
-                              updateField("time", slot.value);
-                              setTimeOpen(false);
-                            }}
-                            className={cn(
-                              "h-9 text-sm font-medium transition-all",
-                              isBooked && "bg-destructive/10 text-destructive/50 border-destructive/20 cursor-not-allowed line-through",
-                              !isBooked && !isSelected && "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/20",
-                              isSelected && "bg-primary text-primary-foreground border-primary hover:bg-primary/90"
-                            )}
-                          >
-                            {slot.label}
-                          </Button>
-                        );
-                      })}
-                    </div>
+                    <Calendar
+                      mode="single"
+                      selected={formData.date ? new Date(formData.date + "T12:00:00") : undefined}
+                      onSelect={(date) => {
+                        if (date) {
+                          const dateStr = format(date, "yyyy-MM-dd");
+                          updateField("date", dateStr);
+                          updateField("time", ""); // Clear time to force re-selection
+                        }
+                        setCalendarOpen(false);
+                      }}
+                      disabled={(date) => {
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        if (date < today) return true;
+                        const dateStr = format(date, "yyyy-MM-dd");
+                        return isDateFullyBooked(dateStr);
+                      }}
+                      modifiers={{
+                        available: (date) => {
+                          const today = new Date();
+                          today.setHours(0, 0, 0, 0);
+                          if (date < today) return false;
+                          const dateStr = format(date, "yyyy-MM-dd");
+                          return getDateAvailability(dateStr) === 'available';
+                        },
+                        limited: (date) => {
+                          const today = new Date();
+                          today.setHours(0, 0, 0, 0);
+                          if (date < today) return false;
+                          const dateStr = format(date, "yyyy-MM-dd");
+                          return getDateAvailability(dateStr) === 'limited';
+                        },
+                        full: (date) => {
+                          const today = new Date();
+                          today.setHours(0, 0, 0, 0);
+                          if (date < today) return false;
+                          const dateStr = format(date, "yyyy-MM-dd");
+                          return getDateAvailability(dateStr) === 'full';
+                        },
+                      }}
+                      modifiersClassNames={{
+                        available: "!bg-emerald-500/20 hover:!bg-emerald-500/30 !text-emerald-700 dark:!text-emerald-300",
+                        limited: "!bg-amber-500/20 hover:!bg-amber-500/30 !text-amber-700 dark:!text-amber-300",
+                        full: "!bg-destructive/20 !text-destructive !opacity-50 !cursor-not-allowed",
+                      }}
+                      className="p-3 pointer-events-auto"
+                      initialFocus
+                    />
                   </PopoverContent>
                 </Popover>
-              )}
-              {errors.time && formData.date && (
-                <p className="text-xs text-destructive">{errors.time}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Contact Info */}
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <FormLabel required>Address</FormLabel>
-              <FormInput
-                placeholder="123 Main St, City, Province"
-                value={formData.address}
-                onChange={e => updateField("address", e.target.value)}
-                error={errors.address}
-              />
-            </div>
-            <div className="space-y-2">
-              <FormLabel required>Name</FormLabel>
-              <FormInput
-                placeholder="Your full name"
-                value={formData.name}
-                onChange={e => updateField("name", e.target.value)}
-                error={errors.name}
-              />
-            </div>
-            <div className="grid sm:grid-cols-2 gap-4">
+                {errors.date && (
+                  <p className="text-xs text-destructive">{errors.date}</p>
+                )}
+                {formData.date && (
+                  <p className="text-xs text-muted-foreground">
+                    {getAvailableSlotsCount(formData.date)} time slots available
+                  </p>
+                )}
+              </div>
               <div className="space-y-2">
-                <FormLabel required>Email</FormLabel>
+                <FormLabel required>Preferred Time</FormLabel>
+                {loadingSlots ? (
+                  <div className="flex items-center h-10 px-3 border rounded-md bg-muted/50 text-muted-foreground text-sm">
+                    Loading available times...
+                  </div>
+                ) : !formData.date ? (
+                  <div className="flex items-center h-10 px-3 border rounded-md bg-muted/50 text-muted-foreground text-sm">
+                    Select a date first
+                  </div>
+                ) : (
+                  <Popover open={timeOpen} onOpenChange={setTimeOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal h-10",
+                          !formData.time && "text-muted-foreground",
+                          errors.time && "border-destructive"
+                        )}
+                      >
+                        <Clock className="mr-2 h-4 w-4" />
+                        {formData.time
+                          ? TIME_SLOTS.find(s => s.value === formData.time)?.label
+                          : "Pick a time"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-64 p-0" align="start">
+                      <div className="p-3 border-b">
+                        <div className="flex items-center gap-4 text-xs">
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                            <span>Available</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-3 h-3 rounded-full bg-destructive" />
+                            <span>Booked</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="p-3 grid grid-cols-2 gap-2 max-h-64 overflow-y-auto pointer-events-auto">
+                        {TIME_SLOTS.map((slot) => {
+                          const isBooked = bookedTimesForDate.has(slot.value);
+                          const isSelected = formData.time === slot.value;
+
+                          return (
+                            <Button
+                              key={slot.value}
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              disabled={isBooked}
+                              onClick={() => {
+                                updateField("time", slot.value);
+                                setTimeOpen(false);
+                              }}
+                              className={cn(
+                                "h-9 text-sm font-medium transition-all",
+                                isBooked && "bg-destructive/10 text-destructive/50 border-destructive/20 cursor-not-allowed line-through",
+                                !isBooked && !isSelected && "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/20",
+                                isSelected && "bg-primary text-primary-foreground border-primary hover:bg-primary/90"
+                              )}
+                            >
+                              {slot.label}
+                            </Button>
+                          );
+                        })}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                )}
+                {errors.time && formData.date && (
+                  <p className="text-xs text-destructive">{errors.time}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Contact Info */}
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <FormLabel required>Address</FormLabel>
                 <FormInput
-                  type="email"
-                  placeholder="you@example.com"
-                  value={formData.email}
-                  onChange={e => updateField("email", e.target.value)}
-                  error={errors.email}
+                  placeholder="123 Main St, City, Province"
+                  value={formData.address}
+                  onChange={e => updateField("address", e.target.value)}
+                  error={errors.address}
                 />
               </div>
               <div className="space-y-2">
-                <FormLabel required>Phone</FormLabel>
+                <FormLabel required>Name</FormLabel>
                 <FormInput
-                  type="tel"
-                  placeholder="(555) 123-4567"
-                  value={formData.phone}
-                  onChange={e => updateField("phone", e.target.value)}
-                  error={errors.phone}
+                  placeholder="Your full name"
+                  value={formData.name}
+                  onChange={e => updateField("name", e.target.value)}
+                  error={errors.name}
+                />
+              </div>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <FormLabel required>Email</FormLabel>
+                  <FormInput
+                    type="email"
+                    placeholder="you@example.com"
+                    value={formData.email}
+                    onChange={e => updateField("email", e.target.value)}
+                    error={errors.email}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <FormLabel required>Phone</FormLabel>
+                  <FormInput
+                    type="tel"
+                    placeholder="(555) 123-4567"
+                    value={formData.phone}
+                    onChange={e => updateField("phone", e.target.value)}
+                    error={errors.phone}
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <FormLabel>Additional Details</FormLabel>
+                <FormTextarea
+                  placeholder="Any special requests or instructions..."
+                  value={formData.details}
+                  onChange={e => updateField("details", e.target.value)}
                 />
               </div>
             </div>
-            <div className="space-y-2">
-              <FormLabel>Additional Details</FormLabel>
-              <FormTextarea
-                placeholder="Any special requests or instructions..."
-                value={formData.details}
-                onChange={e => updateField("details", e.target.value)}
+
+            {/* Mobile Summary */}
+            <div className="lg:hidden">
+              <Summary
+                cleaningType={formData.cleaningType}
+                frequency={formData.frequency}
+                kitchens={formData.kitchens}
+                bathrooms={formData.bathrooms}
+                bedrooms={formData.bedrooms}
+                livingRooms={formData.livingRooms}
+                extras={formData.extras}
+                laundry={formData.laundry}
+                calculation={calculation}
               />
             </div>
+
+            <Button type="submit" className="w-full h-12 text-base" disabled={isSubmitting}>
+              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isSubmitting ? "Submitting..." : "Request Quote"}
+            </Button>
           </div>
 
-          {/* Mobile Summary */}
-          <div className="lg:hidden">
+          {/* Desktop Summary */}
+          <div className="hidden lg:block">
             <Summary
               cleaningType={formData.cleaningType}
               frequency={formData.frequency}
@@ -598,28 +622,8 @@ export function HouseCleaningForm() {
               calculation={calculation}
             />
           </div>
-
-          <Button type="submit" className="w-full h-12 text-base" disabled={isSubmitting}>
-            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isSubmitting ? "Submitting..." : "Request Quote"}
-          </Button>
         </div>
-
-        {/* Desktop Summary */}
-        <div className="hidden lg:block">
-          <Summary
-            cleaningType={formData.cleaningType}
-            frequency={formData.frequency}
-            kitchens={formData.kitchens}
-            bathrooms={formData.bathrooms}
-            bedrooms={formData.bedrooms}
-            livingRooms={formData.livingRooms}
-            extras={formData.extras}
-            laundry={formData.laundry}
-            calculation={calculation}
-          />
-        </div>
-      </div>
-    </form>
+      </form>
+    </>
   );
 }

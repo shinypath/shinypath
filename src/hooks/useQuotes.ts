@@ -40,7 +40,7 @@ export function useQuotes() {
   const fetchQuotes = useCallback(async () => {
     setLoading(true);
     setError(null);
-    
+
     const { data, error: fetchError } = await supabase
       .from('cleaning_quotes')
       .select('*')
@@ -51,7 +51,7 @@ export function useQuotes() {
       setQuotes([]);
     } else {
       // Map database fields to app types
-      const mappedQuotes: CleaningQuote[] = (data || []).map((row: any) => ({
+      const mappedQuotes: CleaningQuote[] = (data || []).map((row: any) => ({ // eslint-disable-line @typescript-eslint/no-explicit-any
         id: row.id,
         form_type: row.form_type as CleaningFormType,
         cleaning_type: row.cleaning_type,
@@ -78,7 +78,7 @@ export function useQuotes() {
       }));
       setQuotes(mappedQuotes);
     }
-    
+
     setLoading(false);
   }, []);
 

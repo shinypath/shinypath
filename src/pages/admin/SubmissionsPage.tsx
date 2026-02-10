@@ -53,14 +53,14 @@ export default function SubmissionsPage() {
   const filteredQuotes = useMemo(() => {
     return quotes
       .filter((quote) => {
-        const matchesSearch = 
+        const matchesSearch =
           quote.client_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           quote.client_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
           quote.client_address.toLowerCase().includes(searchTerm.toLowerCase());
-        
+
         const matchesStatus = statusFilter === 'all' || quote.status === statusFilter;
         const matchesType = typeFilter === 'all' || quote.form_type === typeFilter;
-        
+
         return matchesSearch && matchesStatus && matchesType;
       })
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
@@ -77,6 +77,7 @@ export default function SubmissionsPage() {
     house: 'House',
     office: 'Office',
     'post-construction': 'Post-Construction',
+    contact: 'Contact Form',
   };
 
   const handleRowClick = (booking: CleaningQuote) => {
@@ -139,6 +140,7 @@ export default function SubmissionsPage() {
                 <SelectItem value="house">House</SelectItem>
                 <SelectItem value="office">Office</SelectItem>
                 <SelectItem value="post-construction">Post-Construction</SelectItem>
+                <SelectItem value="contact">Contact Form</SelectItem>
               </SelectContent>
             </Select>
             <Button variant="outline" onClick={refreshQuotes} disabled={loading}>
@@ -199,7 +201,7 @@ export default function SubmissionsPage() {
                   </TableHeader>
                   <TableBody>
                     {filteredQuotes.map((quote) => (
-                      <TableRow 
+                      <TableRow
                         key={quote.id}
                         className="cursor-pointer hover:bg-muted/50"
                         onClick={() => handleRowClick(quote)}

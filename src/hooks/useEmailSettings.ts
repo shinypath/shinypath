@@ -121,7 +121,7 @@ export function useEmailSettings() {
 export type NotificationType = 'appointment_created' | 'appointment_confirmed' | 'appointment_cancelled' | 'appointment_reminder';
 
 export async function sendNotificationEmail(
-  quoteId: string, 
+  quoteId: string,
   notificationType: NotificationType,
   sendToClient = true,
   sendToAdmin = true
@@ -142,8 +142,8 @@ export async function sendNotificationEmail(
     }
 
     return { success: true };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Error invoking send-notification-email:', err);
-    return { success: false, error: err.message };
+    return { success: false, error: err instanceof Error ? err.message : 'Unknown error' };
   }
 }
