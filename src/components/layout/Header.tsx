@@ -29,7 +29,7 @@ export function Header() {
                 { name: "Post-Construction Cleaning", href: "https://shinypathcleaning.ca/services/post-construction-cleaning/" }
             ]
         },
-        { name: "CONTACT", href: "https://shinypathcleaning.ca/contact/" },
+        { name: "CONTACT", href: "/contact" },
     ];
 
     return (
@@ -79,11 +79,11 @@ export function Header() {
                         ))}
                     </nav>
 
-                    <a href="https://app.shinypathcleaning.ca">
+                    <Link to="/">
                         <button className="border-[1.5px] border-[#283D8F] text-[#283D8F] px-6 py-3 rounded-[2px] font-ubuntu font-semibold text-sm uppercase tracking-wide hover:bg-[#283D8F] hover:text-white transition-all duration-300">
                             GET ESTIMATE PRICE
                         </button>
-                    </a>
+                    </Link>
                 </div>
 
                 {/* Mobile Navigation */}
@@ -151,11 +151,11 @@ export function Header() {
                             ))}
 
                             <div className="pt-4 w-full max-w-xs">
-                                <a href="https://app.shinypathcleaning.ca">
+                                <Link to="/">
                                     <button className="w-full bg-[#283D8F] text-white px-6 py-4 rounded-[2px] font-ubuntu font-semibold text-sm uppercase tracking-wide hover:bg-[#283D8F]/90 transition-all">
                                         GET ESTIMATE PRICE
                                     </button>
-                                </a>
+                                </Link>
                             </div>
                         </nav>
                     </div>
