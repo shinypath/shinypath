@@ -28,11 +28,11 @@ import { cn } from '@/lib/utils';
 import shinyPathLogo from '@/assets/shiny-path-logo.svg';
 
 const menuItems = [
-  { title: 'Dashboard', url: '/admin', icon: LayoutDashboard },
-  { title: 'Submissions', url: '/admin/submissions', icon: FileText },
-  { title: 'Calendar', url: '/admin/calendar', icon: Calendar },
-  { title: 'Forms', url: '/admin/forms', icon: ClipboardList },
-  { title: 'Pricing', url: '/admin/pricing', icon: DollarSign },
+  { title: 'Dashboard', url: '/', icon: LayoutDashboard },
+  { title: 'Submissions', url: '/submissions', icon: FileText },
+  { title: 'Calendar', url: '/calendar', icon: Calendar },
+  { title: 'Forms', url: '/forms', icon: ClipboardList },
+  { title: 'Pricing', url: '/pricing', icon: DollarSign },
 ];
 
 export function AdminSidebar() {
@@ -68,7 +68,7 @@ export function AdminSidebar() {
             <SidebarMenu>
               {menuItems.map((item) => {
                 const isActive = location.pathname === item.url ||
-                  (item.url !== '/admin' && location.pathname.startsWith(item.url));
+                  (item.url !== '/' && location.pathname.startsWith(item.url));
 
                 return (
                   <SidebarMenuItem key={item.title}>
