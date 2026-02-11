@@ -38,9 +38,9 @@ export function Header() {
                 {/* Logo */}
                 <Link to="/" className="flex-shrink-0">
                     <img
-                        src="/lovable-uploads/233c7f66-821f-4402-b2d2-8da6d3969567.png"
+                        src="/shiny-path-logo.png"
                         alt="Shiny Path Cleaning"
-                        className="h-12 w-auto md:h-16"
+                        className="w-[130px] md:w-[150px] h-auto"
                     />
                 </Link>
 

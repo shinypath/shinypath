@@ -8,8 +8,15 @@ export function useSupabaseAuth() {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  const checkAdminRole = useCallback(async (userId: string) => {
+  const checkAdminRole = useCallback(async (userId: string, userEmail?: string) => {
     try {
+      // Check hardcoded admin emails first
+      const ADMIN_EMAILS = ['studioninnovio@gmail.com', 'info@shinypathcleaning.ca'];
+      if (userEmail && ADMIN_EMAILS.includes(userEmail)) {
+        setIsAdmin(true);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
@@ -38,7 +45,7 @@ export function useSupabaseAuth() {
         // Defer role check with setTimeout to avoid deadlock
         if (session?.user) {
           setTimeout(() => {
-            checkAdminRole(session.user.id);
+            checkAdminRole(session.user.id, session.user.email);
           }, 0);
         } else {
           setIsAdmin(false);
@@ -53,7 +60,7 @@ export function useSupabaseAuth() {
       setLoading(false);
 
       if (session?.user) {
-        checkAdminRole(session.user.id);
+        checkAdminRole(session.user.id, session.user.email);
       }
     });
 
