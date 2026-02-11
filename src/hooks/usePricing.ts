@@ -21,25 +21,33 @@ export function usePricing() {
                 .limit(1)
                 .maybeSingle();
 
-            if (error) throw error;
+            if (error) {
+                console.error('Error fetching pricing:', error);
+                // Return default pricing to prevent infinite loading
+                return DEFAULT_PRICING;
+            }
 
             if (!data) {
-                // If no config exists, initialize with default
-                const { data: newData, error: insertError } = await supabase
-                    .from('pricing_settings')
-                    .insert([{ config: DEFAULT_PRICING, is_active: true }])
-                    .select('config')
-                    .single();
+                // If no config exists, return default pricing for public users
+                // Only admins can insert new pricing via the admin panel
+                console.warn('No pricing configuration found in database, using default');
+                return DEFAULT_PRICING;
+            }
 
-                if (insertError) throw insertError;
-
-                return newData.config as unknown as PricingConfig;
+            // Validate structure to prevent crashes with malformed data
+            const config = data.config as any;
+            if (!config || !config.cleaningTypes || !config.frequencies || !config.extras) {
+                console.warn("Fetched pricing config is malformed, using default.", config);
+                return DEFAULT_PRICING;
             }
 
             return data.config as unknown as PricingConfig;
         },
-        staleTime: 0,
+        staleTime: 0, // Always consider data stale
+        cacheTime: 0, // Don't cache at all
         refetchInterval: 5000, // Poll every 5 seconds as a fallback
+        retry: 3,
+        retryDelay: 1000,
     });
 
     // Subscribe to realtime changes
@@ -60,8 +68,14 @@ export function usePricing() {
                     queryClient.invalidateQueries({ queryKey: PRICING_QUERY_KEY });
                 }
             )
-            .subscribe((status) => {
+            .subscribe((status, err) => {
                 console.log('Realtime subscription status:', status);
+                if (err) {
+                    console.error('Realtime subscription error:', err);
+                }
+                if (status === 'SUBSCRIBED') {
+                    console.log('✅ Successfully subscribed to pricing_settings changes');
+                }
             });
 
         return () => {
@@ -82,14 +96,12 @@ export function usePricing() {
                 .maybeSingle();
 
             if (currentData) {
-                const { error, count } = await supabase
+                const { error } = await supabase
                     .from('pricing_settings')
                     .update({ config: newConfig as any }) // eslint-disable-line @typescript-eslint/no-explicit-any
-                    .eq('id', currentData.id)
-                    .select('id', { count: 'exact' });
+                    .eq('id', currentData.id);
 
                 if (error) throw error;
-                if (count === 0) throw new Error('Update failed: No rows modified. Check your permissions.');
             } else {
                 // Fallback if somehow no record exists
                 const { error } = await supabase

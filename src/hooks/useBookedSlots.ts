@@ -21,52 +21,57 @@ export function useBookedSlots() {
 
   const fetchBookedSlots = useCallback(async () => {
     setLoading(true);
-    
-    // Get today's date in YYYY-MM-DD format for comparison
-    const today = new Date().toISOString().split('T')[0];
-    
-    const { data, error } = await supabase
-      .from('cleaning_quotes')
-      .select('preferred_date, preferred_time')
-      .neq('status', 'cancelled') // Exclude cancelled appointments
-      .neq('status', 'completed') // Exclude completed appointments (slot is free again)
-      .gte('preferred_date', today); // Only get future or today's slots
 
-    if (error) {
-      console.error('Error fetching booked slots:', error);
+    try {
+      // Get today's date in YYYY-MM-DD format for comparison
+      const today = new Date().toISOString().split('T')[0];
+
+      const { data, error } = await supabase
+        .from('cleaning_quotes')
+        .select('preferred_date, preferred_time')
+        .neq('status', 'cancelled') // Exclude cancelled appointments
+        .neq('status', 'completed') // Exclude completed appointments (slot is free again)
+        .gte('preferred_date', today); // Only get future or today's slots
+
+      if (error) {
+        console.error('Error fetching booked slots:', error);
+        setBookedSlots([]);
+      } else {
+        const now = new Date();
+        const currentHour = now.getHours();
+        const currentMinutes = now.getMinutes();
+
+        // Filter out slots that have already passed today
+        const slots: BookedSlot[] = (data || [])
+          .filter(row => {
+            if (!row.preferred_date || !row.preferred_time) return false;
+
+            // If it's a future date, keep it
+            if (row.preferred_date > today) return true;
+
+            // If it's today, check if the time has passed
+            if (row.preferred_date === today && row.preferred_time) {
+              const [hours, minutes] = row.preferred_time.split(':').map(Number);
+              // Keep slot if it hasn't passed yet
+              if (hours > currentHour) return true;
+              if (hours === currentHour && minutes > currentMinutes) return true;
+              return false; // Time has passed
+            }
+
+            return false;
+          })
+          .map(row => ({
+            date: row.preferred_date,
+            time: row.preferred_time!,
+          }));
+        setBookedSlots(slots);
+      }
+    } catch (err) {
+      console.error('Unexpected error in useBookedSlots:', err);
       setBookedSlots([]);
-    } else {
-      const now = new Date();
-      const currentHour = now.getHours();
-      const currentMinutes = now.getMinutes();
-      
-      // Filter out slots that have already passed today
-      const slots: BookedSlot[] = (data || [])
-        .filter(row => {
-          if (!row.preferred_date || !row.preferred_time) return false;
-          
-          // If it's a future date, keep it
-          if (row.preferred_date > today) return true;
-          
-          // If it's today, check if the time has passed
-          if (row.preferred_date === today && row.preferred_time) {
-            const [hours, minutes] = row.preferred_time.split(':').map(Number);
-            // Keep slot if it hasn't passed yet
-            if (hours > currentHour) return true;
-            if (hours === currentHour && minutes > currentMinutes) return true;
-            return false; // Time has passed
-          }
-          
-          return false;
-        })
-        .map(row => ({
-          date: row.preferred_date,
-          time: row.preferred_time!,
-        }));
-      setBookedSlots(slots);
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   }, []);
 
   useEffect(() => {

@@ -22,7 +22,88 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
-// ... (keep constants)
+// Constants
+const TIME_SLOTS = [
+  { value: "08:00", label: "8:00 AM" },
+  { value: "09:00", label: "9:00 AM" },
+  { value: "10:00", label: "10:00 AM" },
+  { value: "11:00", label: "11:00 AM" },
+  { value: "12:00", label: "12:00 PM" },
+  { value: "13:00", label: "01:00 PM" },
+  { value: "14:00", label: "02:00 PM" },
+  { value: "15:00", label: "03:00 PM" },
+  { value: "16:00", label: "04:00 PM" },
+];
+
+const KITCHEN_OPTIONS = [
+  { value: "0", label: "None" },
+  { value: "1", label: "1 Kitchen" },
+  { value: "2", label: "2 Kitchens" },
+  { value: "3", label: "3 Kitchens" },
+  { value: "4", label: "4 Kitchens" },
+];
+
+const BATHROOM_OPTIONS = [
+  { value: "0", label: "None" },
+  { value: "1", label: "1 Bathroom" },
+  { value: "2", label: "2 Bathrooms" },
+  { value: "3", label: "3 Bathrooms" },
+  { value: "4", label: "4 Bathrooms" },
+  { value: "5", label: "5 Bathrooms" },
+  { value: "6", label: "6 Bathrooms" },
+  { value: "7", label: "7 Bathrooms" },
+  { value: "8", label: "8 Bathrooms" },
+  { value: "1.5", label: "1.5 Bathrooms" },
+  { value: "2.5", label: "2.5 Bathrooms" },
+  { value: "3.5", label: "3.5 Bathrooms" },
+  { value: "4.5", label: "4.5 Bathrooms" },
+  { value: "5.5", label: "5.5 Bathrooms" },
+  { value: "6.5", label: "6.5 Bathrooms" },
+  { value: "7.5", label: "7.5 Bathrooms" },
+];
+
+const BEDROOM_OPTIONS = [
+  { value: "0", label: "None" },
+  { value: "1", label: "1 Bedroom" },
+  { value: "2", label: "2 Bedrooms" },
+  { value: "3", label: "3 Bedrooms" },
+  { value: "4", label: "4 Bedrooms" },
+  { value: "5", label: "5 Bedrooms" },
+  { value: "6", label: "6 Bedrooms" },
+  { value: "7", label: "7 Bedrooms" },
+  { value: "8", label: "8 Bedrooms" },
+  { value: "1.5", label: "1.5 Bedrooms" },
+  { value: "2.5", label: "2.5 Bedrooms" },
+  { value: "3.5", label: "3.5 Bedrooms" },
+  { value: "4.5", label: "4.5 Bedrooms" },
+  { value: "5.5", label: "5.5 Bedrooms" },
+  { value: "6.5", label: "6.5 Bedrooms" },
+  { value: "7.5", label: "7.5 Bedrooms" },
+];
+
+const LIVING_ROOM_OPTIONS = [
+  { value: "0", label: "None" },
+  { value: "1", label: "1 Living Room" },
+  { value: "2", label: "2 Living Rooms" },
+  { value: "3", label: "3 Living Rooms" },
+  { value: "4", label: "4 Living Rooms" },
+  { value: "5", label: "5 Living Rooms" },
+  { value: "6", label: "6 Living Rooms" },
+  { value: "7", label: "7 Living Rooms" },
+  { value: "8", label: "8 Living Rooms" },
+];
+
+const LAUNDRY_OPTIONS = [
+  { value: "0", label: "No Laundry" },
+  { value: "1", label: "1 Person" },
+  { value: "2", label: "2 People" },
+  { value: "3", label: "3 People" },
+  { value: "4", label: "4 People" },
+  { value: "5", label: "5 People" },
+  { value: "6", label: "6 People" },
+];
+
+type Errors = Partial<Record<keyof HouseCleaningFormData, string>>;
 
 import { SuccessModal } from "../modals/SuccessModal";
 
@@ -55,13 +136,20 @@ export function HouseCleaningForm() {
     details: "",
   });
 
-  // Number of slots logic...
-
-  // Get booked times for visual feedback
+  // Get booked times for visual feedback - ALWAYS call all hooks to satisfy Rules of Hooks
   const bookedTimesForDate = useMemo(() => {
     if (!formData.date) return new Set<string>();
     return new Set(getBookedTimesForDate(formData.date));
   }, [formData.date, getBookedTimesForDate]);
+
+  // Debug logging
+  console.log('HouseCleaningForm Render:', {
+    loadingSlots,
+    formDataDate: formData.date,
+    timeOpen,
+    availableSlotsCount: TIME_SLOTS.length,
+    bookedTimesCount: bookedTimesForDate.size
+  });
 
   // Get available time slots for the selected date
   const availableTimeSlots = useMemo(() => {
@@ -82,13 +170,7 @@ export function HouseCleaningForm() {
     laundry: formData.laundry,
   }, pricing);
 
-  if (loadingPricing) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
+
 
   const updateField = <K extends keyof HouseCleaningFormData>(
     field: K,
@@ -200,10 +282,34 @@ export function HouseCleaningForm() {
     }
   };
 
-  const typeOptions = Object.entries(pricing.cleaningTypes).map(([value, { label, price }]) => ({
-    value,
-    label: label,
-  }));
+  const typeOptions = useMemo(() => {
+    if (!pricing || !pricing.cleaningTypes) return [];
+
+    // Enforce specific order: Standard -> Deep -> Move In-Out
+    const order = ['standard', 'deep', 'move-in-out'];
+
+    return order.map(value => {
+      const typeData = pricing.cleaningTypes[value as keyof typeof pricing.cleaningTypes];
+      if (!typeData) return null;
+      return {
+        value,
+        label: typeData.label,
+      };
+    }).filter((item): item is { value: string; label: string } => item !== null);
+  }, [pricing]);
+
+  if (!pricing) {
+    return <div className="p-4 text-red-500">Error: Pricing configuration not loaded.</div>;
+  }
+
+  // Show loading spinner if pricing is still being fetched
+  if (loadingPricing) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -435,11 +541,7 @@ export function HouseCleaningForm() {
               </div>
               <div className="space-y-2">
                 <FormLabel required>Preferred Time</FormLabel>
-                {loadingSlots ? (
-                  <div className="flex items-center h-10 px-3 border rounded-md bg-muted/50 text-muted-foreground text-sm">
-                    Loading available times...
-                  </div>
-                ) : !formData.date ? (
+                {!formData.date ? (
                   <div className="flex items-center h-10 px-3 border rounded-md bg-muted/50 text-muted-foreground text-sm">
                     Select a date first
                   </div>
@@ -448,6 +550,7 @@ export function HouseCleaningForm() {
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
+                        disabled={loadingSlots}
                         className={cn(
                           "w-full justify-start text-left font-normal h-10",
                           !formData.time && "text-muted-foreground",
@@ -455,9 +558,11 @@ export function HouseCleaningForm() {
                         )}
                       >
                         <Clock className="mr-2 h-4 w-4" />
-                        {formData.time
-                          ? TIME_SLOTS.find(s => s.value === formData.time)?.label
-                          : "Pick a time"}
+                        {loadingSlots
+                          ? "Loading..."
+                          : formData.time
+                            ? TIME_SLOTS.find(s => s.value === formData.time)?.label
+                            : "Pick a time"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-64 p-0" align="start">

@@ -167,20 +167,24 @@ export default function PricingConfigPage() {
           </AccordionTrigger>
           <AccordionContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4">
-              {Object.entries(config.cleaningTypes).map(([type, data]) => (
-                <div key={type} className="space-y-2">
-                  <Label>{data.label}</Label>
-                  <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground">$</span>
-                    <Input
-                      type="number"
-                      value={data.price}
-                      onChange={(e) => updateCleaningType(type, Number(e.target.value))}
-                      min={0}
-                    />
+              {['standard', 'deep', 'move-in-out'].map((type) => {
+                const data = config?.cleaningTypes?.[type as keyof typeof config.cleaningTypes];
+                if (!data) return null;
+                return (
+                  <div key={type} className="space-y-2">
+                    <Label>{data.label}</Label>
+                    <div className="flex items-center gap-2">
+                      <span className="text-muted-foreground">$</span>
+                      <Input
+                        type="number"
+                        value={data.price}
+                        onChange={(e) => updateCleaningType(type, Number(e.target.value))}
+                        min={0}
+                      />
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </AccordionContent>
         </AccordionItem>

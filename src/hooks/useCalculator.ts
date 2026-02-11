@@ -13,10 +13,26 @@ interface CalculatorInput {
   laundry: number;
 }
 
-export function useCalculator(input: CalculatorInput, pricing: PricingConfig): CalculatedPrice {
+export function useCalculator(input: CalculatorInput, pricing: PricingConfig | undefined): CalculatedPrice {
 
 
   return useMemo(() => {
+    if (!pricing) {
+      return {
+        typePrice: 0,
+        kitchenPrice: 0,
+        bathroomPrice: 0,
+        bedroomPrice: 0,
+        livingRoomPrice: 0,
+        extrasPrice: 0,
+        laundryPrice: 0,
+        subtotal: 0,
+        discountPercent: 0,
+        discountAmount: 0,
+        total: 0,
+      };
+    }
+
     const typePrice = pricing.cleaningTypes[input.cleaningType as keyof typeof pricing.cleaningTypes]?.price ?? 110;
     const kitchenPrice = pricing.kitchens[input.kitchens] ?? 0;
     const bathroomPrice = pricing.bathrooms[input.bathrooms] ?? 0;
