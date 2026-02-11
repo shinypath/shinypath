@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   FileText,
@@ -39,6 +39,7 @@ export function AdminSidebar() {
   const { signOut, user } = useAuth();
   const { state, setOpenMobile, isMobile } = useSidebar();
   const location = useLocation();
+  const navigate = useNavigate();
   const collapsed = state === 'collapsed';
 
   const handleNavClick = () => {
@@ -103,7 +104,10 @@ export function AdminSidebar() {
         <Button
           variant="ghost"
           className="w-full justify-start gap-3 text-white/90 hover:text-white hover:bg-white/10 min-h-[44px] py-3"
-          onClick={signOut}
+          onClick={async () => {
+            await signOut();
+            navigate('/jhosso');
+          }}
         >
           <LogOut className="h-5 w-5" />
           {!collapsed && <span className="font-sans">Sign Out</span>}

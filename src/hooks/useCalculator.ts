@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { getPricing, type Extra } from '@/lib/pricing';
+import type { PricingConfig, Extra } from '@/lib/pricing';
 import type { CalculatedPrice } from '@/lib/types';
 
 interface CalculatorInput {
@@ -13,8 +13,8 @@ interface CalculatorInput {
   laundry: number;
 }
 
-export function useCalculator(input: CalculatorInput): CalculatedPrice {
-  const pricing = useMemo(() => getPricing(), []);
+export function useCalculator(input: CalculatorInput, pricing: PricingConfig): CalculatedPrice {
+
 
   return useMemo(() => {
     const typePrice = pricing.cleaningTypes[input.cleaningType as keyof typeof pricing.cleaningTypes]?.price ?? 110;

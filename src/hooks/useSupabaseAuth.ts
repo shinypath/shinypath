@@ -99,12 +99,12 @@ export function useSupabaseAuth() {
   };
 
   const signOut = async () => {
+    // Always clear local state regardless of server response
+    setUser(null);
+    setSession(null);
+    setIsAdmin(false);
+
     const { error } = await supabase.auth.signOut();
-    if (!error) {
-      setUser(null);
-      setSession(null);
-      setIsAdmin(false);
-    }
     return { error };
   };
 

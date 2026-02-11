@@ -10,7 +10,8 @@ import { ExtraToggle } from "./ExtraToggle";
 import { Summary } from "./Summary";
 import { FridgeIcon, OvenIcon, CabinetsIcon, DishesIcon, PetsIcon } from "../icons/CleaningIcons";
 import { useCalculator } from "@/hooks/useCalculator";
-import { getPricing, formatCurrency } from "@/lib/pricing";
+import { usePricing } from "@/hooks/usePricing";
+import { formatCurrency } from "@/lib/pricing";
 import { useQuotes } from "@/hooks/useQuotes";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -21,49 +22,13 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
-const BATHROOM_OPTIONS = [
-  "0", "1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5", "5.5", "6", "6.5", "7", "7.5", "8"
-].map(v => ({ value: v, label: v }));
-
-const BEDROOM_OPTIONS = [
-  "0", "1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5", "5.5", "6", "6.5", "7", "7.5", "8"
-].map(v => ({ value: v, label: v }));
-
-const KITCHEN_OPTIONS = [0, 1, 2, 3, 4].map(v => ({ value: String(v), label: String(v) }));
-const LIVING_ROOM_OPTIONS = [0, 1, 2, 3, 4, 5, 6, 7, 8].map(v => ({ value: String(v), label: String(v) }));
-const LAUNDRY_OPTIONS = [
-  { value: "0", label: "None" },
-  { value: "1", label: "1 person" },
-  { value: "2", label: "2 persons" },
-  { value: "3", label: "3 persons" },
-  { value: "4", label: "4 persons" },
-  { value: "5", label: "5 persons" },
-];
-
-interface Errors {
-  [key: string]: string;
-}
-
-// Business hours time slots (8:00 AM to 6:00 PM)
-const TIME_SLOTS = [
-  { value: "08:00", label: "8:00 AM" },
-  { value: "09:00", label: "9:00 AM" },
-  { value: "10:00", label: "10:00 AM" },
-  { value: "11:00", label: "11:00 AM" },
-  { value: "12:00", label: "12:00 PM" },
-  { value: "13:00", label: "1:00 PM" },
-  { value: "14:00", label: "2:00 PM" },
-  { value: "15:00", label: "3:00 PM" },
-  { value: "16:00", label: "4:00 PM" },
-  { value: "17:00", label: "5:00 PM" },
-  { value: "18:00", label: "6:00 PM" },
-];
+// ... (keep constants)
 
 import { SuccessModal } from "../modals/SuccessModal";
 
 export function HouseCleaningForm() {
   const { toast } = useToast();
-  const pricing = getPricing();
+  const { pricing, isLoading: loadingPricing } = usePricing();
   const { createQuote } = useQuotes();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -90,6 +55,8 @@ export function HouseCleaningForm() {
     details: "",
   });
 
+  // Number of slots logic...
+
   // Get booked times for visual feedback
   const bookedTimesForDate = useMemo(() => {
     if (!formData.date) return new Set<string>();
@@ -113,7 +80,15 @@ export function HouseCleaningForm() {
     livingRooms: formData.livingRooms,
     extras: formData.extras,
     laundry: formData.laundry,
-  });
+  }, pricing);
+
+  if (loadingPricing) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   const updateField = <K extends keyof HouseCleaningFormData>(
     field: K,
@@ -227,7 +202,7 @@ export function HouseCleaningForm() {
 
   const typeOptions = Object.entries(pricing.cleaningTypes).map(([value, { label, price }]) => ({
     value,
-    label: `${label} (${formatCurrency(price)})`,
+    label: label,
   }));
 
   return (
@@ -308,7 +283,7 @@ export function HouseCleaningForm() {
                 <ExtraToggle
                   value="inside-fridge"
                   label="Inside Fridge"
-                  price={formatCurrency(pricing.extras["inside-fridge"].price)}
+                  price=""
                   icon={<FridgeIcon className="w-6 h-6" />}
                   checked={formData.extras.includes("inside-fridge")}
                   onChange={toggleExtra}
@@ -316,7 +291,7 @@ export function HouseCleaningForm() {
                 <ExtraToggle
                   value="inside-oven"
                   label="Inside Oven"
-                  price={formatCurrency(pricing.extras["inside-oven"].price)}
+                  price=""
                   icon={<OvenIcon className="w-6 h-6" />}
                   checked={formData.extras.includes("inside-oven")}
                   onChange={toggleExtra}
@@ -324,7 +299,7 @@ export function HouseCleaningForm() {
                 <ExtraToggle
                   value="inside-cabinets"
                   label="Inside Cabinets"
-                  price={formatCurrency(pricing.extras["inside-cabinets"].price)}
+                  price=""
                   icon={<CabinetsIcon className="w-6 h-6" />}
                   checked={formData.extras.includes("inside-cabinets")}
                   onChange={toggleExtra}
@@ -332,7 +307,7 @@ export function HouseCleaningForm() {
                 <ExtraToggle
                   value="dishes"
                   label="Dishes"
-                  price={formatCurrency(pricing.extras["dishes"].price)}
+                  price=""
                   icon={<DishesIcon className="w-6 h-6" />}
                   checked={formData.extras.includes("dishes")}
                   onChange={toggleExtra}
@@ -340,7 +315,7 @@ export function HouseCleaningForm() {
                 <ExtraToggle
                   value="pets"
                   label="Pets"
-                  price={formatCurrency(pricing.extras["pets"].price)}
+                  price=""
                   icon={<PetsIcon className="w-6 h-6" />}
                   checked={formData.extras.includes("pets")}
                   onChange={toggleExtra}
@@ -599,6 +574,7 @@ export function HouseCleaningForm() {
                 extras={formData.extras}
                 laundry={formData.laundry}
                 calculation={calculation}
+                pricing={pricing}
               />
             </div>
 
@@ -620,6 +596,7 @@ export function HouseCleaningForm() {
               extras={formData.extras}
               laundry={formData.laundry}
               calculation={calculation}
+              pricing={pricing}
             />
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { formatCurrency, getPricing } from "@/lib/pricing";
+import { formatCurrency, type PricingConfig } from "@/lib/pricing";
 import type { CalculatedPrice } from "@/lib/types";
 import { Sparkles } from "lucide-react";
 
@@ -12,6 +12,7 @@ interface SummaryProps {
   extras: string[];
   laundry: number;
   calculation: CalculatedPrice;
+  pricing: PricingConfig;
 }
 
 export function Summary({
@@ -24,8 +25,8 @@ export function Summary({
   extras,
   laundry,
   calculation,
+  pricing,
 }: SummaryProps) {
-  const pricing = getPricing();
 
   const typeLabel = pricing.cleaningTypes[cleaningType as keyof typeof pricing.cleaningTypes]?.label ?? cleaningType;
   const freqConfig = pricing.frequencies[frequency as keyof typeof pricing.frequencies];
