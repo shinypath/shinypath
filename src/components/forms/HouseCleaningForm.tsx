@@ -37,60 +37,60 @@ const TIME_SLOTS = [
 
 const KITCHEN_OPTIONS = [
   { value: "0", label: "None" },
-  { value: "1", label: "1 Kitchen" },
-  { value: "2", label: "2 Kitchens" },
-  { value: "3", label: "3 Kitchens" },
-  { value: "4", label: "4 Kitchens" },
+  { value: "1", label: "1" },
+  { value: "2", label: "2" },
+  { value: "3", label: "3" },
+  { value: "4", label: "4" },
 ];
 
 const BATHROOM_OPTIONS = [
   { value: "0", label: "None" },
-  { value: "1", label: "1 Bathroom" },
-  { value: "2", label: "2 Bathrooms" },
-  { value: "3", label: "3 Bathrooms" },
-  { value: "4", label: "4 Bathrooms" },
-  { value: "5", label: "5 Bathrooms" },
-  { value: "6", label: "6 Bathrooms" },
-  { value: "7", label: "7 Bathrooms" },
-  { value: "8", label: "8 Bathrooms" },
-  { value: "1.5", label: "1.5 Bathrooms" },
-  { value: "2.5", label: "2.5 Bathrooms" },
-  { value: "3.5", label: "3.5 Bathrooms" },
-  { value: "4.5", label: "4.5 Bathrooms" },
-  { value: "5.5", label: "5.5 Bathrooms" },
-  { value: "6.5", label: "6.5 Bathrooms" },
-  { value: "7.5", label: "7.5 Bathrooms" },
+  { value: "1", label: "1" },
+  { value: "1.5", label: "1.5" },
+  { value: "2", label: "2" },
+  { value: "2.5", label: "2.5" },
+  { value: "3", label: "3" },
+  { value: "3.5", label: "3.5" },
+  { value: "4", label: "4" },
+  { value: "4.5", label: "4.5" },
+  { value: "5", label: "5" },
+  { value: "5.5", label: "5.5" },
+  { value: "6", label: "6" },
+  { value: "6.5", label: "6.5" },
+  { value: "7", label: "7" },
+  { value: "7.5", label: "7.5" },
+  { value: "8", label: "8" },
 ];
 
 const BEDROOM_OPTIONS = [
   { value: "0", label: "None" },
-  { value: "1", label: "1 Bedroom" },
-  { value: "2", label: "2 Bedrooms" },
-  { value: "3", label: "3 Bedrooms" },
-  { value: "4", label: "4 Bedrooms" },
-  { value: "5", label: "5 Bedrooms" },
-  { value: "6", label: "6 Bedrooms" },
-  { value: "7", label: "7 Bedrooms" },
-  { value: "8", label: "8 Bedrooms" },
-  { value: "1.5", label: "1.5 Bedrooms" },
-  { value: "2.5", label: "2.5 Bedrooms" },
-  { value: "3.5", label: "3.5 Bedrooms" },
-  { value: "4.5", label: "4.5 Bedrooms" },
-  { value: "5.5", label: "5.5 Bedrooms" },
-  { value: "6.5", label: "6.5 Bedrooms" },
-  { value: "7.5", label: "7.5 Bedrooms" },
+  { value: "1", label: "1" },
+  { value: "1.5", label: "1.5" },
+  { value: "2", label: "2" },
+  { value: "2.5", label: "2.5" },
+  { value: "3", label: "3" },
+  { value: "3.5", label: "3.5" },
+  { value: "4", label: "4" },
+  { value: "4.5", label: "4.5" },
+  { value: "5", label: "5" },
+  { value: "5.5", label: "5.5" },
+  { value: "6", label: "6" },
+  { value: "6.5", label: "6.5" },
+  { value: "7", label: "7" },
+  { value: "7.5", label: "7.5" },
+  { value: "8", label: "8" },
 ];
 
 const LIVING_ROOM_OPTIONS = [
   { value: "0", label: "None" },
-  { value: "1", label: "1 Living Room" },
-  { value: "2", label: "2 Living Rooms" },
-  { value: "3", label: "3 Living Rooms" },
-  { value: "4", label: "4 Living Rooms" },
-  { value: "5", label: "5 Living Rooms" },
-  { value: "6", label: "6 Living Rooms" },
-  { value: "7", label: "7 Living Rooms" },
-  { value: "8", label: "8 Living Rooms" },
+  { value: "1", label: "1" },
+  { value: "2", label: "2" },
+  { value: "3", label: "3" },
+  { value: "4", label: "4" },
+  { value: "5", label: "5" },
+  { value: "6", label: "6" },
+  { value: "7", label: "7" },
+  { value: "8", label: "8" },
 ];
 
 const LAUNDRY_OPTIONS = [
@@ -102,6 +102,9 @@ const LAUNDRY_OPTIONS = [
   { value: "5", label: "5 People" },
   { value: "6", label: "6 People" },
 ];
+
+// Order for frequency display (one-time, weekly, every other week, every 4 weeks)
+const FREQUENCY_ORDER = ['one-time', 'weekly', 'every-other-week', 'every-4-weeks'];
 
 type Errors = Partial<Record<keyof HouseCleaningFormData, string>>;
 
@@ -333,16 +336,20 @@ export function HouseCleaningForm() {
             <div className="space-y-3">
               <FormLabel required>Frequency</FormLabel>
               <div className="grid sm:grid-cols-2 gap-3">
-                {Object.entries(pricing.frequencies).map(([value, { label, discount }]) => (
-                  <FrequencyCheckbox
-                    key={value}
-                    value={value}
-                    label={label}
-                    discountLabel={discount > 0 ? `${Math.round(discount * 100)}% off` : undefined}
-                    checked={formData.frequency === value}
-                    onChange={(val) => updateField("frequency", val)}
-                  />
-                ))}
+                {FREQUENCY_ORDER.map(value => {
+                  const freqData = pricing.frequencies[value as keyof typeof pricing.frequencies];
+                  if (!freqData) return null;
+                  return (
+                    <FrequencyCheckbox
+                      key={value}
+                      value={value}
+                      label={freqData.label}
+                      discountLabel={freqData.discount > 0 ? `${Math.round(freqData.discount * 100)}% off` : undefined}
+                      checked={formData.frequency === value}
+                      onChange={(val) => updateField("frequency", val)}
+                    />
+                  );
+                })}
               </div>
             </div>
 

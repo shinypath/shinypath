@@ -181,7 +181,7 @@ export default function Contact() {
                                 </h3>
                             </div>
                             <div className="text-[#283D8F] text-[15px] space-y-1">
-                                <p>• Monday to Friday: 9am - 4pm</p>
+                                <p>• Monday to Friday: 9am - 5pm</p>
                                 <p>• Saturdays and Sundays: Upon request</p>
                                 <p>• After Hours: Upon request</p>
                             </div>
