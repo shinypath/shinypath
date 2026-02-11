@@ -8,6 +8,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import shinyLogoBlue from "@/assets/shiny-logo-blue.svg";
 
 export function Header() {
     const [isOpen, setIsOpen] = useState(false);
@@ -38,7 +39,7 @@ export function Header() {
                 {/* Logo */}
                 <Link to="/" className="flex-shrink-0">
                     <img
-                        src="/shiny-path-logo.png"
+                        src={shinyLogoBlue}
                         alt="Shiny Path Cleaning"
                         className="w-[130px] md:w-[150px] h-auto"
                     />

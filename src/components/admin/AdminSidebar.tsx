@@ -1,9 +1,9 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  FileText, 
-  Calendar, 
-  DollarSign, 
+import {
+  LayoutDashboard,
+  FileText,
+  Calendar,
+  DollarSign,
   Settings,
   LogOut,
   ClipboardList,
@@ -36,7 +36,7 @@ const menuItems = [
 ];
 
 export function AdminSidebar() {
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const { state, setOpenMobile, isMobile } = useSidebar();
   const location = useLocation();
   const collapsed = state === 'collapsed';
@@ -60,21 +60,21 @@ export function AdminSidebar() {
           )}
         </div>
       </SidebarHeader>
-      
+
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="text-white/70">Menu</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => {
-                const isActive = location.pathname === item.url || 
+                const isActive = location.pathname === item.url ||
                   (item.url !== '/admin' && location.pathname.startsWith(item.url));
-                
+
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild isActive={isActive} className="min-h-[44px]">
-                      <NavLink 
-                        to={item.url} 
+                      <NavLink
+                        to={item.url}
                         onClick={handleNavClick}
                         className={cn(
                           "flex items-center gap-3 text-white/90 hover:text-white hover:bg-white/10 py-3",
@@ -94,9 +94,15 @@ export function AdminSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border p-4">
-        <Button 
-          variant="ghost" 
-          className="w-full justify-start gap-3 text-white/90 hover:text-white hover:bg-white/10 min-h-[44px] py-3" 
+        {!collapsed && user?.email && (
+          <div className="mb-4 px-2">
+            <p className="text-xs text-white/50 font-sans uppercase tracking-wider mb-1">Signed in as</p>
+            <p className="text-sm text-white/90 font-sans truncate" title={user.email}>{user.email}</p>
+          </div>
+        )}
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-3 text-white/90 hover:text-white hover:bg-white/10 min-h-[44px] py-3"
           onClick={signOut}
         >
           <LogOut className="h-5 w-5" />
