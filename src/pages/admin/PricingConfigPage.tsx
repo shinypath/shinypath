@@ -73,7 +73,14 @@ export default function PricingConfigPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl sm:text-2xl font-tenor tracking-wide text-foreground">Pricing Configuration</h2>
-          <p className="text-sm text-muted-foreground">Manage prices for cleaning services</p>
+          <div className="flex flex-col gap-1">
+            <p className="text-sm text-muted-foreground">Manage prices for cleaning services</p>
+            {pricing && (
+              <p className="text-xs text-muted-foreground/80">
+                Last synced from DB: {new Date().toLocaleTimeString()}
+              </p>
+            )}
+          </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <AlertDialog>

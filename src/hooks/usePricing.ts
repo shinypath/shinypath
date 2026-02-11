@@ -82,12 +82,14 @@ export function usePricing() {
                 .maybeSingle();
 
             if (currentData) {
-                const { error } = await supabase
+                const { error, count } = await supabase
                     .from('pricing_settings')
                     .update({ config: newConfig as any }) // eslint-disable-line @typescript-eslint/no-explicit-any
-                    .eq('id', currentData.id);
+                    .eq('id', currentData.id)
+                    .select('id', { count: 'exact' });
 
                 if (error) throw error;
+                if (count === 0) throw new Error('Update failed: No rows modified. Check your permissions.');
             } else {
                 // Fallback if somehow no record exists
                 const { error } = await supabase
