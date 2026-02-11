@@ -38,11 +38,13 @@ export function usePricing() {
 
             return data.config as unknown as PricingConfig;
         },
-        staleTime: Infinity, // Rely on realtime subscription for updates
+        staleTime: 0,
+        refetchInterval: 5000, // Poll every 5 seconds as a fallback
     });
 
     // Subscribe to realtime changes
     useEffect(() => {
+        console.log('Setting up realtime subscription for pricing_settings...');
         const channel = supabase
             .channel('pricing_changes')
             .on(
@@ -51,16 +53,19 @@ export function usePricing() {
                     event: '*',
                     schema: 'public',
                     table: 'pricing_settings',
-                    filter: 'is_active=eq.true',
+                    // Removed filter to ensure we catch all events for debugging
                 },
                 (payload) => {
                     console.log('Pricing updated realtime:', payload);
                     queryClient.invalidateQueries({ queryKey: PRICING_QUERY_KEY });
                 }
             )
-            .subscribe();
+            .subscribe((status) => {
+                console.log('Realtime subscription status:', status);
+            });
 
         return () => {
+            console.log('Cleaning up realtime subscription...');
             supabase.removeChannel(channel);
         };
     }, [queryClient]);
