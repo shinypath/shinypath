@@ -34,16 +34,6 @@ const AppRoutes = () => {
   return (
     <Routes>
       {/* Public Routes */}
-      <Route
-        path="/"
-        element={
-          isAuthenticated && isAdmin ? (
-            <Navigate to="/admin" replace />
-          ) : (
-            <QuoteRequest />
-          )
-        }
-      />
       <Route path="/quote-request" element={<QuoteRequest />} />
       <Route path="/contact" element={<Contact />} />
 
@@ -51,9 +41,10 @@ const AppRoutes = () => {
       <Route path="/jhosso" element={<AuthPage />} />
       <Route path="/admin/login" element={<Navigate to="/jhosso" replace />} />
 
-      {/* Admin Routes */}
-      <Route path="/admin" element={<AdminLayout />}>
+      {/* Admin Routes - Index is now the Dashboard */}
+      <Route path="/" element={<AdminLayout />}>
         <Route index element={<AdminDashboard />} />
+        <Route path="admin" element={<Navigate to="/" replace />} /> {/* Redirect old /admin to root */}
         <Route path="submissions" element={<SubmissionsPage />} />
         <Route path="calendar" element={<CalendarPage />} />
         <Route path="forms" element={<FormsPage />} />

@@ -2,7 +2,7 @@
     "name": "Shiny Path Cleaning",
     "short_name": "Shiny Path",
     "description": "Shiny Path Cleaning - Professional Cleaning Services",
-    "start_url": "/",
+    "start_url": "/admin",
     "display": "standalone",
     "background_color": "#283D8F",
     "theme_color": "#283D8F",
