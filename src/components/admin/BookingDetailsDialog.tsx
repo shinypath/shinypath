@@ -21,11 +21,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Calendar, 
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
   Clock,
   CheckCircle,
   XCircle,
@@ -45,9 +45,9 @@ interface BookingDetailsDialogProps {
   onDelete: (id: string) => Promise<boolean>;
 }
 
-export function BookingDetailsDialog({ 
-  booking, 
-  open, 
+export function BookingDetailsDialog({
+  booking,
+  open,
   onOpenChange,
   onUpdate,
   onStatusChange,
@@ -55,6 +55,8 @@ export function BookingDetailsDialog({
 }: BookingDetailsDialogProps) {
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
 
   if (!booking) return null;
 
@@ -66,21 +68,25 @@ export function BookingDetailsDialog({
 
     if (booking.form_type === 'house') {
       subject = `Booking Confirmation - ${booking.preferred_date}`;
+      const extrasText = booking.extras.length > 0 ? `\nExtras: ${booking.extras.join(', ')}` : '';
+
       body = `Hi ${clientName},
 
-Thank you for your booking request with Shiny Path Cleaning!
+Your appointment with Shiny Path Cleaning is confirmed! Here are your booking details:
 
-Here are your booking details:
-- Service: ${booking.cleaning_type} Cleaning
-- Date: ${booking.preferred_date}
-- Time: ${booking.preferred_time || 'To be confirmed'}
-- Address: ${booking.client_address}
-- Rooms: ${booking.kitchens} Kitchen, ${booking.bathrooms} Bath, ${booking.bedrooms} Bed, ${booking.living_rooms} Living
-${booking.extras.length > 0 ? `- Extras: ${booking.extras.join(', ')}` : ''}
-${booking.laundry_persons > 0 ? `- Laundry: ${booking.laundry_persons} person(s)` : ''}
-- Total: $${booking.total.toFixed(2)}
+Service: ${booking.cleaning_type} cleaning
 
-Please confirm if everything looks correct.
+Date: ${booking.preferred_date}
+
+Time: ${booking.preferred_time || 'To be confirmed'}
+
+Address: ${booking.client_address}
+
+Rooms: ${booking.kitchens} Kitchen, ${booking.bathrooms} Bath, ${booking.bedrooms} Bed, ${booking.living_rooms} Living${extrasText}
+
+Total: $${booking.total.toFixed(2)}
+
+If anything needs to be updated, please let us know. Otherwise, we look forward to providing you with a spotless clean!
 
 Best regards,
 Shiny Path Cleaning Team`;
@@ -126,24 +132,20 @@ Shiny Path Cleaning Team`;
   // Generate SMS template based on form type
   const generateSmsTemplate = () => {
     const clientName = booking.client_name.split(' ')[0]; // First name
-    
+
     if (booking.form_type === 'house') {
       const extras = booking.extras.length > 0 ? `\nExtras: ${booking.extras.join(', ')}` : '';
-      const laundry = booking.laundry_persons > 0 ? `\nLaundry: ${booking.laundry_persons} person(s)` : '';
-      const notes = booking.details ? `\nNotes: ${booking.details}` : '';
-      
-      return `Hi ${clientName}! This is Shiny Path Cleaning confirming your booking:
 
-Service: ${booking.cleaning_type} Cleaning
-Frequency: ${booking.frequency}
+      return `Hi ${clientName}! Your appointment with Shiny Path Cleaning is confirmed!
+
+Service: ${booking.cleaning_type} cleaning
 Date: ${booking.preferred_date}
-Time: ${booking.preferred_time || 'To be confirmed'}
+Time: ${booking.preferred_time || 'TBD'}
 Address: ${booking.client_address}
-Rooms: ${booking.kitchens} Kitchen, ${booking.bathrooms} Bath, ${booking.bedrooms} Bed, ${booking.living_rooms} Living${extras}${laundry}${notes}
-
+Rooms: ${booking.kitchens} Kitchen, ${booking.bathrooms} Bath, ${booking.bedrooms} Bed, ${booking.living_rooms} Living${extras}
 Total: $${booking.total.toFixed(2)}
 
-Reply to confirm or call us with any questions!`;
+If anything needs to be updated, please let us know. We look forward to providing you with a spotless clean!`;
     } else if (booking.form_type === 'office') {
       const details = booking.details ? `\nProject Details: ${booking.details}` : '';
       return `Hi ${clientName}! This is Shiny Path Cleaning. We received your office cleaning quote request.
@@ -165,8 +167,78 @@ We'll assess your needs and get back to you shortly with a customized quote. Tha
     }
   };
 
+  // Generate cancellation email template
+  const generateCancellationEmailTemplate = () => {
+    const clientName = booking.client_name.split(' ')[0];
+    let subject = '';
+    let body = '';
+
+    if (booking.form_type === 'house') {
+      subject = `Booking Cancellation - ${booking.preferred_date}`;
+      const extrasText = booking.extras.length > 0 ? `\nExtras: ${booking.extras.join(', ')}` : '';
+
+      body = `Hi ${clientName},
+
+Your appointment with Shiny Path Cleaning has been successfully canceled.
+
+Here were your booking details:
+
+Service: ${booking.cleaning_type} cleaning
+
+Date: ${booking.preferred_date}
+
+Time: ${booking.preferred_time || 'To be confirmed'}
+
+Address: ${booking.client_address}
+
+Rooms: ${booking.kitchens} Kitchen, ${booking.bathrooms} Bath, ${booking.bedrooms} Bed, ${booking.living_rooms} Living${extrasText}
+
+If this cancellation was made in error or you'd like to reschedule, please let us know — we'll be happy to assist.
+
+Best regards,
+Shiny Path Cleaning Team`;
+    } else {
+      subject = 'Quote Request Cancelled';
+      body = `Hi ${clientName},
+
+We regret to inform you that your quote request with Shiny Path Cleaning has been cancelled.
+
+If you would like to request a new quote or have any questions, please feel free to contact us.
+
+Best regards,
+Shiny Path Cleaning Team`;
+    }
+
+    return { subject, body };
+  };
+
+  // Generate cancellation SMS template
+  const generateCancellationSmsTemplate = () => {
+    const clientName = booking.client_name.split(' ')[0];
+
+    if (booking.form_type === 'house') {
+      const extras = booking.extras.length > 0 ? `\nExtras: ${booking.extras.join(', ')}` : '';
+
+      return `Hi ${clientName}, your appointment with Shiny Path Cleaning has been successfully canceled.
+
+Here were your booking details:
+
+Service: ${booking.cleaning_type} cleaning
+Date: ${booking.preferred_date}
+Time: ${booking.preferred_time || 'TBD'}
+Address: ${booking.client_address}
+Rooms: ${booking.kitchens} Kitchen, ${booking.bathrooms} Bath, ${booking.bedrooms} Bed, ${booking.living_rooms} Living${extras}
+
+If this cancellation was made in error or you'd like to reschedule, please let us know — we'll be happy to assist.`;
+    } else {
+      return `Hi ${clientName}, this is Shiny Path Cleaning. We regret to inform you that your quote request has been cancelled. Please feel free to contact us if you'd like to request a new quote.`;
+    }
+  };
+
   const emailTemplate = generateEmailTemplate();
   const smsTemplate = generateSmsTemplate();
+  const cancellationEmailTemplate = generateCancellationEmailTemplate();
+  const cancellationSmsTemplate = generateCancellationSmsTemplate();
 
   const handleStatusChange = async (status: QuoteStatus) => {
     setIsUpdating(true);
@@ -219,14 +291,14 @@ We'll assess your needs and get back to you shortly with a customized quote. Tha
             <div className="bg-muted/50 rounded-lg p-4 space-y-3">
               <p className="font-medium text-lg">{booking.client_name}</p>
               <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-4">
-                <a 
+                <a
                   href={`mailto:${booking.client_email}`}
                   className="flex items-center gap-2 text-primary hover:underline text-sm sm:text-base break-all"
                 >
                   <Mail className="h-4 w-4 flex-shrink-0" />
                   {booking.client_email}
                 </a>
-                <a 
+                <a
                   href={`tel:${booking.client_phone}`}
                   className="flex items-center gap-2 text-primary hover:underline text-sm sm:text-base"
                 >
@@ -268,7 +340,7 @@ We'll assess your needs and get back to you shortly with a customized quote. Tha
           {/* Service Details */}
           <div>
             <h3 className="font-ubuntu text-lg uppercase tracking-wide mb-3 text-primary">Service Details</h3>
-            
+
             {/* House Cleaning specific fields */}
             {booking.form_type === 'house' && (
               <>
@@ -282,7 +354,7 @@ We'll assess your needs and get back to you shortly with a customized quote. Tha
                     <span>{booking.preferred_time || 'Not specified'}</span>
                   </div>
                 </div>
-                
+
                 <div className="mt-4 space-y-2">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Type:</span>
@@ -387,9 +459,9 @@ We'll assess your needs and get back to you shortly with a customized quote. Tha
               {booking.form_type === 'house' && (
                 <>
                   {booking.status !== 'confirmed' && booking.status !== 'cancelled' && (
-                    <Button 
-                      variant="default" 
-                      onClick={() => handleStatusChange('confirmed')}
+                    <Button
+                      variant="default"
+                      onClick={() => setShowConfirmDialog(true)}
                       disabled={isUpdating}
                     >
                       {isUpdating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CheckCircle className="h-4 w-4 mr-2" />}
@@ -397,7 +469,7 @@ We'll assess your needs and get back to you shortly with a customized quote. Tha
                     </Button>
                   )}
                   {booking.status === 'confirmed' && (
-                    <Button 
+                    <Button
                       variant="default"
                       onClick={() => handleStatusChange('completed')}
                       disabled={isUpdating}
@@ -407,9 +479,9 @@ We'll assess your needs and get back to you shortly with a customized quote. Tha
                     </Button>
                   )}
                   {booking.status !== 'cancelled' && (
-                    <Button 
-                      variant="outline" 
-                      onClick={() => handleStatusChange('cancelled')}
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowCancelDialog(true)}
                       disabled={isUpdating}
                     >
                       {isUpdating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <XCircle className="h-4 w-4 mr-2" />}
@@ -417,8 +489,8 @@ We'll assess your needs and get back to you shortly with a customized quote. Tha
                     </Button>
                   )}
                   {booking.status === 'cancelled' && (
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       onClick={() => handleStatusChange('pending')}
                       disabled={isUpdating}
                     >
@@ -428,7 +500,7 @@ We'll assess your needs and get back to you shortly with a customized quote. Tha
                   )}
                 </>
               )}
-              
+
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive" disabled={isDeleting}>
@@ -440,7 +512,7 @@ We'll assess your needs and get back to you shortly with a customized quote. Tha
                   <AlertDialogHeader>
                     <AlertDialogTitle>Delete Booking?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete the booking 
+                      This action cannot be undone. This will permanently delete the booking
                       for {booking.client_name}.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
@@ -462,6 +534,96 @@ We'll assess your needs and get back to you shortly with a customized quote. Tha
           </div>
         </div>
       </DialogContent>
+
+      {/* Confirmation Dialog */}
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Send Confirmation to Client?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Choose how you'd like to notify {booking.client_name.split(' ')[0]} about the confirmed booking.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                window.location.href = `mailto:${booking.client_email}?subject=${encodeURIComponent(emailTemplate.subject)}&body=${encodeURIComponent(emailTemplate.body)}`;
+                setShowConfirmDialog(false);
+                handleStatusChange('confirmed');
+              }}
+              className="w-full sm:w-auto"
+            >
+              <Mail className="h-4 w-4 mr-2" />
+              Send Email
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                window.location.href = `sms:${booking.client_phone}?body=${encodeURIComponent(smsTemplate)}`;
+                setShowConfirmDialog(false);
+                handleStatusChange('confirmed');
+              }}
+              className="w-full sm:w-auto"
+            >
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Send SMS
+            </Button>
+            <AlertDialogCancel className="w-full sm:w-auto">Skip & Confirm</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => handleStatusChange('confirmed')}
+              className="hidden"
+            >
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Cancellation Dialog */}
+      <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Send Cancellation to Client?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Choose how you'd like to notify {booking.client_name.split(' ')[0]} about the cancelled booking.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                window.location.href = `mailto:${booking.client_email}?subject=${encodeURIComponent(cancellationEmailTemplate.subject)}&body=${encodeURIComponent(cancellationEmailTemplate.body)}`;
+                setShowCancelDialog(false);
+                handleStatusChange('cancelled');
+              }}
+              className="w-full sm:w-auto"
+            >
+              <Mail className="h-4 w-4 mr-2" />
+              Send Email
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                window.location.href = `sms:${booking.client_phone}?body=${encodeURIComponent(cancellationSmsTemplate)}`;
+                setShowCancelDialog(false);
+                handleStatusChange('cancelled');
+              }}
+              className="w-full sm:w-auto"
+            >
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Send SMS
+            </Button>
+            <AlertDialogCancel className="w-full sm:w-auto">Skip & Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => handleStatusChange('cancelled')}
+              className="hidden"
+            >
+              Cancel
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 }
