@@ -32,9 +32,11 @@ import {
   RotateCcw,
   Trash2,
   MessageSquare,
-  Loader2
+  Loader2,
+  Pencil
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { EditBookingDialog } from './EditBookingDialog';
 
 interface BookingDetailsDialogProps {
   booking: CleaningQuote | null;
@@ -57,6 +59,7 @@ export function BookingDetailsDialog({
   const [isDeleting, setIsDeleting] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   if (!booking) return null;
 
@@ -276,11 +279,17 @@ If this cancellation was made in error or you'd like to reschedule, please let u
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-4">
-            <span className="font-tenor uppercase tracking-wide">Booking Details</span>
-            <Badge className={`${statusColors[booking.status]} font-ubuntu hover:bg-inherit cursor-default pointer-events-none`}>
-              {booking.status}
-            </Badge>
+          <DialogTitle className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <span className="font-tenor uppercase tracking-wide">Booking Details</span>
+              <Badge className={`${statusColors[booking.status]} font-ubuntu hover:bg-inherit cursor-default pointer-events-none`}>
+                {booking.status}
+              </Badge>
+            </div>
+            <Button variant="outline" size="sm" onClick={() => setEditDialogOpen(true)} className="mr-12">
+              <Pencil className="h-4 w-4 mr-2" />
+              Edit
+            </Button>
           </DialogTitle>
         </DialogHeader>
 
@@ -624,6 +633,12 @@ If this cancellation was made in error or you'd like to reschedule, please let u
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <EditBookingDialog
+        booking={booking}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        onUpdate={onUpdate}
+      />
     </Dialog>
   );
 }

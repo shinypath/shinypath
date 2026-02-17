@@ -3,6 +3,7 @@ import { useQuotes } from '@/hooks/useQuotes';
 import { CleaningQuote, QuoteStatus, CleaningFormType } from '@/lib/types';
 import { formatCurrency } from '@/lib/pricing';
 import { BookingDetailsDialog } from '@/components/admin/BookingDetailsDialog';
+import { EditBookingDialog } from '@/components/admin/EditBookingDialog';
 import { SwipeableSubmissionCard } from '@/components/admin/SwipeableSubmissionCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -41,10 +42,16 @@ export default function SubmissionsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<QuoteStatus | 'all'>('all');
   const [typeFilter, setTypeFilter] = useState<CleaningFormType | 'all'>('all');
-  const [selectedBooking, setSelectedBooking] = useState<CleaningQuote | null>(null);
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [quoteToDelete, setQuoteToDelete] = useState<CleaningQuote | null>(null);
+
+  const selectedBooking = useMemo(() =>
+    quotes.find((q) => q.id === selectedBookingId) || null,
+    [quotes, selectedBookingId]
+  );
 
   const refreshQuotes = () => {
     fetchQuotes();
@@ -81,8 +88,13 @@ export default function SubmissionsPage() {
   };
 
   const handleRowClick = (booking: CleaningQuote) => {
-    setSelectedBooking(booking);
+    setSelectedBookingId(booking.id);
     setDialogOpen(true);
+  };
+
+  const handleEdit = (booking: CleaningQuote) => {
+    setSelectedBookingId(booking.id);
+    setEditDialogOpen(true);
   };
 
   const handleDeleteClick = (e: React.MouseEvent, quote: CleaningQuote) => {
@@ -96,6 +108,11 @@ export default function SubmissionsPage() {
       deleteQuote(quoteToDelete.id);
       setDeleteDialogOpen(false);
       setQuoteToDelete(null);
+      if (selectedBookingId === quoteToDelete.id) {
+        setDialogOpen(false);
+        setEditDialogOpen(false);
+        setSelectedBookingId(null);
+      }
     }
   };
 
@@ -177,6 +194,7 @@ export default function SubmissionsPage() {
                     key={quote.id}
                     quote={quote}
                     onClick={() => handleRowClick(quote)}
+                    onEdit={handleEdit}
                     onDelete={deleteQuote}
                     statusColors={statusColors}
                     typeLabels={typeLabels}
@@ -247,7 +265,6 @@ export default function SubmissionsPage() {
           )}
         </CardContent>
       </Card>
-
       <BookingDetailsDialog
         booking={selectedBooking}
         open={dialogOpen}
@@ -255,6 +272,13 @@ export default function SubmissionsPage() {
         onUpdate={refreshQuotes}
         onStatusChange={updateQuoteStatus}
         onDelete={deleteQuote}
+      />
+
+      <EditBookingDialog
+        booking={selectedBooking}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        onUpdate={refreshQuotes}
       />
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

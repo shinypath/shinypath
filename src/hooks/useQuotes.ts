@@ -112,6 +112,25 @@ export function useQuotes() {
     return data as CleaningQuote;
   };
 
+  const updateQuote = async (id: string, updates: Partial<CleaningQuote>): Promise<CleaningQuote | null> => {
+    // Omitting fields that shouldn't be updated directly or are handled automatically
+    const { id: _, created_at, updated_at, ...updateData } = updates;
+
+    const { data, error: updateError } = await supabase
+      .from('cleaning_quotes')
+      .update({ ...updateData, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (updateError) {
+      throw new Error(updateError.message);
+    }
+
+    await fetchQuotes();
+    return data as CleaningQuote;
+  };
+
   const updateQuoteStatus = async (id: string, status: QuoteStatus): Promise<CleaningQuote | null> => {
     const { data, error: updateError } = await supabase
       .from('cleaning_quotes')
@@ -174,6 +193,7 @@ export function useQuotes() {
     error,
     fetchQuotes,
     createQuote,
+    updateQuote,
     updateQuoteStatus,
     deleteQuote,
     getQuoteById,

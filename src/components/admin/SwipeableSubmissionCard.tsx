@@ -1,12 +1,14 @@
 import { useState, useRef } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Pencil } from 'lucide-react';
 import { CleaningQuote, QuoteStatus, CleaningFormType } from '@/lib/types';
 import { formatCurrency } from '@/lib/pricing';
+import { Button } from '@/components/ui/button';
 
 interface SwipeableSubmissionCardProps {
   quote: CleaningQuote;
   onClick: () => void;
+  onEdit: (quote: CleaningQuote) => void;
   onDelete: (id: string) => void;
   statusColors: Record<QuoteStatus, string>;
   typeLabels: Record<CleaningFormType, string>;
@@ -15,6 +17,7 @@ interface SwipeableSubmissionCardProps {
 export function SwipeableSubmissionCard({
   quote,
   onClick,
+  onEdit,
   onDelete,
   statusColors,
   typeLabels,
@@ -36,20 +39,20 @@ export function SwipeableSubmissionCard({
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!isDragging) return;
-    
+
     const currentX = e.touches[0].clientX;
     const diff = currentX - startXRef.current;
     let newTranslate = currentXRef.current + diff;
-    
+
     // Only allow swiping left (negative values)
     newTranslate = Math.min(0, Math.max(MAX_SWIPE, newTranslate));
-    
+
     setTranslateX(newTranslate);
   };
 
   const handleTouchEnd = () => {
     setIsDragging(false);
-    
+
     // Snap to open or closed position
     if (translateX < DELETE_THRESHOLD / 2) {
       setTranslateX(DELETE_THRESHOLD);
@@ -76,7 +79,7 @@ export function SwipeableSubmissionCard({
   return (
     <div className="relative overflow-hidden rounded-lg">
       {/* Delete button background */}
-      <div 
+      <div
         className="absolute inset-y-0 right-0 flex items-center justify-end bg-destructive"
         style={{ width: Math.abs(DELETE_THRESHOLD) }}
       >
@@ -123,6 +126,35 @@ export function SwipeableSubmissionCard({
           <span className="font-medium text-foreground">
             {quote.total > 0 ? formatCurrency(quote.total) : 'Quote'}
           </span>
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center gap-2 mt-4 pt-4 border-t" onClick={(e) => e.stopPropagation()}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="flex-1 h-9 text-muted-foreground hover:text-foreground"
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(quote);
+            }}
+          >
+            <Pencil className="h-4 w-4 mr-2" />
+            Edit
+          </Button>
+          <div className="w-px h-4 bg-border" />
+          <Button
+            variant="ghost"
+            size="sm"
+            className="flex-1 h-9 text-destructive hover:text-destructive hover:bg-destructive/10"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(quote.id);
+            }}
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Delete
+          </Button>
         </div>
       </div>
     </div>
