@@ -445,9 +445,11 @@ If this cancellation was made in error or you'd like to reschedule, please let u
                   <span>{formatCurrency(booking.subtotal)}</span>
                 </div>
                 {booking.discount > 0 && (
-                  <div className="flex justify-between text-green-600">
+                  <div className="flex justify-between items-center text-green-600">
                     <span>Discount:</span>
-                    <span>-{formatCurrency(booking.discount)}</span>
+                    <span className="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full font-medium">
+                      {Math.round((booking.discount / booking.subtotal) * 100)}% off
+                    </span>
                   </div>
                 )}
                 <div className="flex justify-between text-lg font-bold">

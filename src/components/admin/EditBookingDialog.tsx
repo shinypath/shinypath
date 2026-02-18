@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { CleaningQuote, QuoteStatus, CleaningFormType } from '@/lib/types';
-import { formatCurrency } from '@/lib/pricing';
+import { formatCurrency, type PricingConfig } from '@/lib/pricing';
 import { useQuotes } from '@/hooks/useQuotes';
 import { useBookedSlots } from "@/hooks/useBookedSlots";
 import { usePricing } from "@/hooks/usePricing";
@@ -64,7 +64,7 @@ export function EditBookingDialog({
     const [timeOpen, setTimeOpen] = useState(false);
 
     // Pricing & Calculation
-    const { pricing } = usePricing();
+    const { pricing } = usePricing() as unknown as { pricing: PricingConfig };
 
     // Form State
     const [formData, setFormData] = useState<Partial<CleaningQuote>>({});
@@ -285,10 +285,28 @@ export function EditBookingDialog({
                                                 <SelectValue placeholder="Select frequency" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="One-time">One-time</SelectItem>
-                                                <SelectItem value="Weekly">Weekly</SelectItem>
-                                                <SelectItem value="Bi-weekly">Bi-weekly</SelectItem>
-                                                <SelectItem value="Monthly">Monthly</SelectItem>
+                                                {['one-time', 'weekly', 'every-other-week', 'every-4-weeks'].map((freqValue) => {
+                                                    const freqConfig = pricing?.frequencies[freqValue as keyof typeof pricing.frequencies];
+                                                    const discount = freqConfig?.discount || 0;
+                                                    // Map our internal keys to the display labels we want (or use config labels)
+                                                    // The original dialog used "Bi-weekly" and "Monthly" which differ slightly from config labels sometimes
+                                                    // but let's use the config labels for consistency if possible, or fallback to manual mapping if needed to match exact UI reqs.
+                                                    // Given the previous code used "Bi-weekly" for "every-other-week" and "Monthly" for "every-4-weeks",
+                                                    // and config likely has "Every other week" and "Every 4 weeks".
+                                                    // I will stick to the labels that were there or use the config ones?
+                                                    // The user request said "like in the house cleaning form".
+                                                    // HouseCleaningForm uses `freqData.label`.
+                                                    // standard: One-time, Weekly, Every other week, Every 4 weeks.
+                                                    // The Edit dialog previously had: One-time, Weekly, Bi-weekly, Monthly.
+                                                    // I will use the labels from the pricing config to be consistent with the main form as requested.
+                                                    const label = freqConfig?.label || freqValue;
+
+                                                    return (
+                                                        <SelectItem key={freqValue} value={freqValue}>
+                                                            {label}
+                                                        </SelectItem>
+                                                    );
+                                                })}
                                             </SelectContent>
                                         </Select>
                                     </div>
@@ -405,10 +423,12 @@ export function EditBookingDialog({
                                     <span className="text-muted-foreground">Subtotal:</span>
                                     <span>{formatCurrency(calculation.subtotal)}</span>
                                 </div>
-                                {calculation.discountAmount > 0 && (
-                                    <div className="flex justify-between text-green-600">
+                                {calculation.discountPercent > 0 && (
+                                    <div className="flex justify-between items-center text-green-600">
                                         <span>Discount:</span>
-                                        <span>-{formatCurrency(calculation.discountAmount)}</span>
+                                        <span className="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full font-medium">
+                                            {Math.round(calculation.discountPercent * 100)}% off
+                                        </span>
                                     </div>
                                 )}
                                 <div className="flex justify-between text-lg font-bold">
