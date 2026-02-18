@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuotes } from "@/hooks/useQuotes";
 import { Loader2, Phone, Mail, Clock } from "lucide-react";
 import { SuccessModal } from "@/components/modals/SuccessModal";
+import { Footer } from "@/components/layout/Footer";
 import type { ContactFormData } from "@/lib/types";
 
 interface Errors {
@@ -269,12 +270,7 @@ export default function Contact() {
                 </div>
             </section>
 
-            {/* Footer */}
-            <footer className="border-t bg-card mt-12">
-                <div className="container py-6 text-center text-sm text-muted-foreground">
-                    © {new Date().getFullYear()} Shiny Path Cleaning. All rights reserved.
-                </div>
-            </footer>
+            <Footer />
         </div>
     );
 }

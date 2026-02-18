@@ -20,6 +20,7 @@ import type { HouseCleaningFormData } from "@/lib/types";
 import { useBookedSlots, type DateAvailability } from "@/hooks/useBookedSlots";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 
 // Constants
@@ -106,7 +107,7 @@ const LAUNDRY_OPTIONS = [
 // Order for frequency display (one-time, weekly, every other week, every 4 weeks)
 const FREQUENCY_ORDER = ['one-time', 'weekly', 'every-other-week', 'every-4-weeks'];
 
-type Errors = Partial<Record<keyof HouseCleaningFormData, string>>;
+type Errors = Partial<Record<keyof HouseCleaningFormData, string> & { terms: string }>;
 
 import { SuccessModal } from "../modals/SuccessModal";
 
@@ -138,6 +139,7 @@ export function HouseCleaningForm() {
     phone: "",
     details: "",
   });
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   // Get booked times for visual feedback - ALWAYS call all hooks to satisfy Rules of Hooks
   const bookedTimesForDate = useMemo(() => {
@@ -211,6 +213,7 @@ export function HouseCleaningForm() {
     }
     if (!formData.date) newErrors.date = "Date is required";
     if (!formData.time) newErrors.time = "Time is required";
+    if (!termsAccepted) newErrors.terms = "You must accept the privacy policy and terms of use";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -274,6 +277,7 @@ export function HouseCleaningForm() {
         phone: "",
         details: "",
       });
+      setTermsAccepted(false);
     } catch {
       toast({
         variant: "destructive",
@@ -671,6 +675,34 @@ export function HouseCleaningForm() {
                   value={formData.details}
                   onChange={e => updateField("details", e.target.value)}
                 />
+              </div>
+            </div>
+
+            {/* Terms and Conditions */}
+            <div className="space-y-2">
+              <div className="flex items-start space-x-2">
+                <Checkbox
+                  id="terms"
+                  checked={termsAccepted}
+                  onCheckedChange={(checked) => {
+                    setTermsAccepted(checked as boolean);
+                    if (checked && errors.terms) {
+                      setErrors(prev => ({ ...prev, terms: "" }));
+                    }
+                  }}
+                  required
+                />
+                <div className="grid gap-1.5 leading-none">
+                  <label
+                    htmlFor="terms"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    I accept the <a href="https://app.shinypathcleaning.ca/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">privacy policy</a> and <a href="https://app.shinypathcleaning.ca/terms-of-use" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">terms of use</a> of the Shiny Path website.
+                  </label>
+                  {errors.terms && (
+                    <p className="text-xs text-destructive">{errors.terms}</p>
+                  )}
+                </div>
               </div>
             </div>
 

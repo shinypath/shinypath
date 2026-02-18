@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Loader2, Building2 } from "lucide-react";
 import type { OfficeCleaningFormData } from "@/lib/types";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Errors {
   [key: string]: string;
@@ -29,6 +30,7 @@ export function OfficeCleaningForm() {
     phone: "",
     details: "",
   });
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const updateField = <K extends keyof OfficeCleaningFormData>(
     field: K,
@@ -55,6 +57,7 @@ export function OfficeCleaningForm() {
     } else if (!/^[\d\s\-()+]{7,20}$/.test(formData.phone)) {
       newErrors.phone = "Invalid phone number";
     }
+    if (!termsAccepted) newErrors.terms = "You must accept the privacy policy and terms of use";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -108,6 +111,7 @@ export function OfficeCleaningForm() {
         phone: "",
         details: "",
       });
+      setTermsAccepted(false);
     } catch {
       toast({
         variant: "destructive",
@@ -185,6 +189,33 @@ export function OfficeCleaningForm() {
               value={formData.details}
               onChange={e => updateField("details", e.target.value)}
             />
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-start space-x-2">
+              <Checkbox
+                id="terms"
+                checked={termsAccepted}
+                onCheckedChange={(checked) => {
+                  setTermsAccepted(checked as boolean);
+                  if (checked && errors.terms) {
+                    setErrors(prev => ({ ...prev, terms: "" }));
+                  }
+                }}
+                required
+              />
+              <div className="grid gap-1.5 leading-none">
+                <label
+                  htmlFor="terms"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  I accept the <a href="https://app.shinypathcleaning.ca/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">privacy policy</a> and <a href="https://app.shinypathcleaning.ca/terms-of-use" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">terms of use</a> of the Shiny Path website.
+                </label>
+                {errors.terms && (
+                  <p className="text-xs text-destructive">{errors.terms}</p>
+                )}
+              </div>
+            </div>
           </div>
 
           <Button type="submit" className="w-full h-12 text-base" disabled={isSubmitting}>

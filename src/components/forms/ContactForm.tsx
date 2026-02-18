@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import type { ContactFormData } from "@/lib/types";
+import { Checkbox } from "@/components/ui/checkbox";
 import { SuccessModal } from "../modals/SuccessModal";
 
 interface Errors {
@@ -26,6 +27,7 @@ export function ContactForm() {
         phone: "",
         message: "",
     });
+    const [termsAccepted, setTermsAccepted] = useState(false);
 
     const updateField = <K extends keyof ContactFormData>(
         field: K,
@@ -54,6 +56,7 @@ export function ContactForm() {
         if (!formData.message.trim()) {
             newErrors.message = "Message is required";
         }
+        if (!termsAccepted) newErrors.terms = "You must accept the privacy policy and terms of use";
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -96,6 +99,7 @@ export function ContactForm() {
                 phone: "",
                 message: "",
             });
+            setTermsAccepted(false);
         } catch {
             toast({
                 variant: "destructive",
@@ -157,12 +161,41 @@ export function ContactForm() {
                         />
                     </div>
 
+
+
+                    <div className="space-y-2">
+                        <div className="flex items-start space-x-2">
+                            <Checkbox
+                                id="terms"
+                                checked={termsAccepted}
+                                onCheckedChange={(checked) => {
+                                    setTermsAccepted(checked as boolean);
+                                    if (checked && errors.terms) {
+                                        setErrors(prev => ({ ...prev, terms: "" }));
+                                    }
+                                }}
+                                required
+                            />
+                            <div className="grid gap-1.5 leading-none">
+                                <label
+                                    htmlFor="terms"
+                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                >
+                                    I accept the <a href="https://app.shinypathcleaning.ca/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">privacy policy</a> and <a href="https://app.shinypathcleaning.ca/terms-of-use" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">terms of use</a> of the Shiny Path website.
+                                </label>
+                                {errors.terms && (
+                                    <p className="text-xs text-destructive">{errors.terms}</p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
                     <Button type="submit" className="w-full h-12 text-base" disabled={isSubmitting}>
                         {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         {isSubmitting ? "Sending..." : "Send Message"}
                     </Button>
                 </div>
-            </form>
+            </form >
         </>
     );
 }

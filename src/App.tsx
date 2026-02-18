@@ -9,6 +9,8 @@ import QuoteRequest from "./pages/QuoteRequest";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import AuthPage from "./pages/auth/AuthPage";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfUse from "./pages/TermsOfUse";
 import AdminLayout from "./layouts/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import SubmissionsPage from "./pages/admin/SubmissionsPage";
@@ -36,6 +38,8 @@ const AppRoutes = () => {
       {/* Public Routes */}
       <Route path="/quote-request" element={<QuoteRequest />} />
       <Route path="/contact" element={<Contact />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      <Route path="/terms-of-use" element={<TermsOfUse />} />
 
       {/* Auth */}
       <Route path="/jhosso" element={<AuthPage />} />
