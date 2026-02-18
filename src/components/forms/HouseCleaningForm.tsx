@@ -12,6 +12,7 @@ import { FridgeIcon, OvenIcon, CabinetsIcon, DishesIcon, PetsIcon } from "../ico
 import { useCalculator } from "@/hooks/useCalculator";
 import { usePricing } from "@/hooks/usePricing";
 import { formatCurrency } from "@/lib/pricing";
+import { formatPhoneNumber, isValidCanadianPhone } from "@/lib/phoneUtils";
 import { useQuotes } from "@/hooks/useQuotes";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -176,7 +177,6 @@ export function HouseCleaningForm() {
   }, pricing);
 
 
-
   const updateField = <K extends keyof HouseCleaningFormData>(
     field: K,
     value: HouseCleaningFormData[K]
@@ -184,6 +184,14 @@ export function HouseCleaningForm() {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: "" }));
+    }
+  };
+
+  const updatePhone = (value: string) => {
+    const formatted = formatPhoneNumber(value);
+    setFormData(prev => ({ ...prev, phone: formatted }));
+    if (errors.phone) {
+      setErrors(prev => ({ ...prev, phone: "" }));
     }
   };
 
@@ -208,8 +216,8 @@ export function HouseCleaningForm() {
     }
     if (!formData.phone.trim()) {
       newErrors.phone = "Phone is required";
-    } else if (!/^[\d\s\-()+]{7,20}$/.test(formData.phone)) {
-      newErrors.phone = "Invalid phone number";
+    } else if (!isValidCanadianPhone(formData.phone)) {
+      newErrors.phone = "Invalid Canadian phone number. Format: (XXX) XXX-XXXX";
     }
     if (!formData.date) newErrors.date = "Date is required";
     if (!formData.time) newErrors.time = "Time is required";
@@ -661,9 +669,9 @@ export function HouseCleaningForm() {
                   <FormLabel required>Phone</FormLabel>
                   <FormInput
                     type="tel"
-                    placeholder="(555) 123-4567"
+                    placeholder="(416) 123-4567"
                     value={formData.phone}
-                    onChange={e => updateField("phone", e.target.value)}
+                    onChange={e => updatePhone(e.target.value)}
                     error={errors.phone}
                   />
                 </div>

@@ -9,6 +9,7 @@ import { Loader2 } from "lucide-react";
 import type { ContactFormData } from "@/lib/types";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SuccessModal } from "../modals/SuccessModal";
+import { formatPhoneNumber, isValidCanadianPhone } from "@/lib/phoneUtils";
 
 interface Errors {
     [key: string]: string;
@@ -39,6 +40,14 @@ export function ContactForm() {
         }
     };
 
+    const updatePhone = (value: string) => {
+        const formatted = formatPhoneNumber(value);
+        setFormData(prev => ({ ...prev, phone: formatted }));
+        if (errors.phone) {
+            setErrors(prev => ({ ...prev, phone: "" }));
+        }
+    };
+
     const validateForm = (): boolean => {
         const newErrors: Errors = {};
 
@@ -50,8 +59,8 @@ export function ContactForm() {
         }
         if (!formData.phone.trim()) {
             newErrors.phone = "Phone is required";
-        } else if (!/^[\d\s\-()+]{7,20}$/.test(formData.phone)) {
-            newErrors.phone = "Invalid phone number";
+        } else if (!isValidCanadianPhone(formData.phone)) {
+            newErrors.phone = "Invalid Canadian phone number. Format: (XXX) XXX-XXXX";
         }
         if (!formData.message.trim()) {
             newErrors.message = "Message is required";
@@ -143,9 +152,9 @@ export function ContactForm() {
                             <FormLabel required>Phone</FormLabel>
                             <FormInput
                                 type="tel"
-                                placeholder="(555) 123-4567"
+                                placeholder="(416) 123-4567"
                                 value={formData.phone}
-                                onChange={e => updateField("phone", e.target.value)}
+                                onChange={e => updatePhone(e.target.value)}
                                 error={errors.phone}
                             />
                         </div>

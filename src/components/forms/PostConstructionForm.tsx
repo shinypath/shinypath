@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, HardHat } from "lucide-react";
 import type { PostConstructionFormData } from "@/lib/types";
 import { Checkbox } from "@/components/ui/checkbox";
+import { formatPhoneNumber, isValidCanadianPhone } from "@/lib/phoneUtils";
 
 interface Errors {
   [key: string]: string;
@@ -30,7 +31,6 @@ export function PostConstructionForm() {
     details: "",
   });
   const [termsAccepted, setTermsAccepted] = useState(false);
-
   const updateField = <K extends keyof PostConstructionFormData>(
     field: K,
     value: PostConstructionFormData[K]
@@ -38,6 +38,14 @@ export function PostConstructionForm() {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: "" }));
+    }
+  };
+
+  const updatePhone = (value: string) => {
+    const formatted = formatPhoneNumber(value);
+    setFormData(prev => ({ ...prev, phone: formatted }));
+    if (errors.phone) {
+      setErrors(prev => ({ ...prev, phone: "" }));
     }
   };
 
@@ -53,8 +61,8 @@ export function PostConstructionForm() {
     }
     if (!formData.phone.trim()) {
       newErrors.phone = "Phone is required";
-    } else if (!/^[\d\s\-()+]{7,20}$/.test(formData.phone)) {
-      newErrors.phone = "Invalid phone number";
+    } else if (!isValidCanadianPhone(formData.phone)) {
+      newErrors.phone = "Invalid Canadian phone number. Format: (XXX) XXX-XXXX";
     }
     if (!termsAccepted) newErrors.terms = "You must accept the privacy policy and terms of use";
 
@@ -163,9 +171,9 @@ export function PostConstructionForm() {
               <FormLabel required>Phone</FormLabel>
               <FormInput
                 type="tel"
-                placeholder="(555) 123-4567"
+                placeholder="(416) 123-4567"
                 value={formData.phone}
-                onChange={e => updateField("phone", e.target.value)}
+                onChange={e => updatePhone(e.target.value)}
                 error={errors.phone}
               />
             </div>
