@@ -37,13 +37,13 @@ export function Header() {
         <header className="bg-white shadow-sm sticky top-0 z-50 w-full transition-all duration-300 border-t-[5px] border-[#283D8F]">
             <div className="container mx-auto px-4 h-24 flex items-center justify-between">
                 {/* Logo */}
-                <Link to="/" className="flex-shrink-0">
+                <a href="https://shinypathcleaning.ca/" className="flex-shrink-0">
                     <img
                         src={shinyLogoBlue}
                         alt="Shiny Path Cleaning"
                         className="w-[130px] md:w-[150px] h-auto"
                     />
-                </Link>
+                </a>
 
                 {/* Desktop Navigation */}
                 <div className="hidden lg:flex items-center gap-8">
