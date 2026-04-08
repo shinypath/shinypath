@@ -127,7 +127,7 @@ export default function Contact() {
                         Get in touch with us
                     </p>
                     <p className="max-w-2xl mx-auto text-[#283D8F]/80 text-[15px] md:text-[16px] leading-relaxed">
-                        We're available Monday to Friday from 9am to 4pm. For weekend or after-hours service, please contact us and we'll do our best to accommodate your needs.
+                        We're available Monday to Friday from 8am to 6pm. For weekend or flexible scheduling, please contact us and we'll do our best to accommodate your needs.
                     </p>
                     <Button
                         onClick={scrollToForm}
@@ -182,9 +182,9 @@ export default function Contact() {
                                 </h3>
                             </div>
                             <div className="text-[#283D8F] text-[15px] space-y-1">
-                                <p>• Monday to Friday: 9am - 5pm</p>
-                                <p>• Saturdays and Sundays: Upon request</p>
-                                <p>• After Hours: Upon request</p>
+                                <p>• Mon–Fri: 8am – 6pm</p>
+                                <p>• Weekend: Upon request</p>
+                                <p>• Flexible scheduling available</p>
                             </div>
                         </div>
                     </div>
