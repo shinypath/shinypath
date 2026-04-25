@@ -45,18 +45,14 @@ export function Summary({
       <div className="space-y-3 text-sm">
         {/* Cleaning Type */}
         <div className="flex justify-between">
+          <span>Type of Cleaning</span>
           <span>{typeLabel}</span>
-          <span className="font-medium">{formatCurrency(calculation.typePrice)}</span>
         </div>
 
         {/* Frequency */}
         <div className="flex justify-between items-center">
+          <span>Frequency</span>
           <span>{freqLabel}</span>
-          {discountPercent > 0 && (
-            <span className="text-xs bg-status-confirmed/15 text-status-confirmed px-2 py-0.5 rounded-full">
-              {Math.round(discountPercent * 100)}% off
-            </span>
-          )}
         </div>
 
         <hr className="border-border" />
@@ -65,28 +61,28 @@ export function Summary({
         {kitchens > 0 && (
           <div className="flex justify-between">
             <span>Kitchen ({kitchens})</span>
-            <span>{formatCurrency(calculation.kitchenPrice)}</span>
+            <span></span>
           </div>
         )}
 
         {Number(bathrooms) > 0 && (
           <div className="flex justify-between">
             <span>Bathroom ({bathrooms})</span>
-            <span>{formatCurrency(calculation.bathroomPrice)}</span>
+            <span></span>
           </div>
         )}
 
         {Number(bedrooms) > 0 && (
           <div className="flex justify-between">
             <span>Bedroom ({bedrooms})</span>
-            <span>{formatCurrency(calculation.bedroomPrice)}</span>
+            <span></span>
           </div>
         )}
 
         {livingRooms > 0 && (
           <div className="flex justify-between">
             <span>Living Room ({livingRooms})</span>
-            <span>{formatCurrency(calculation.livingRoomPrice)}</span>
+            <span></span>
           </div>
         )}
 
@@ -100,7 +96,7 @@ export function Summary({
               return (
                 <div key={extra} className="flex justify-between">
                   <span>{extraConfig.label}</span>
-                  <span>{formatCurrency(extraConfig.price)}</span>
+                  <span></span>
                 </div>
               );
             })}
@@ -112,8 +108,8 @@ export function Summary({
           <>
             {(hasRooms || extras.length > 0) && <hr className="border-border" />}
             <div className="flex justify-between">
-              <span>Laundry ({laundry} person{laundry > 1 ? 's' : ''})</span>
-              <span>{formatCurrency(calculation.laundryPrice)}</span>
+              <span>Laundry ({laundry} {laundry > 1 ? 'people' : 'person'})</span>
+              <span></span>
             </div>
           </>
         )}
@@ -126,6 +122,14 @@ export function Summary({
           <span>{formatCurrency(calculation.subtotal)}</span>
         </div>
 
+        {discountPercent > 0 && (
+          <div className="flex justify-between items-center">
+            <span className="text-status-confirmed">Savings ({freqLabel})</span>
+            <span className="text-xs bg-status-confirmed/15 text-status-confirmed px-2 py-0.5 rounded-full">
+              {Math.round(discountPercent * 100)}% off
+            </span>
+          </div>
+        )}
 
         {/* Total */}
         <div className="flex justify-between text-xl font-bold text-primary pt-2 border-t border-border font-display">
