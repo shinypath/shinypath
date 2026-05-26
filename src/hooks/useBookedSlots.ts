@@ -1,37 +1,36 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useBlockedSlots } from './useBlockedSlots';
 
 export interface BookedSlot {
   date: string; // YYYY-MM-DD
   time: string; // HH:MM
 }
 
-// Total available slots per day (8:00 AM to 6:00 PM = 11 slots)
-export const TOTAL_DAILY_SLOTS = 11;
+// Total available slots per day (8:00 AM to 6:00 PM = 11 slots, actually from TIME_SLOTS it is 9 slots, but we'll leave as 11 if it was defined so, or just use 9)
+export const TOTAL_DAILY_SLOTS = 9; // Updated from 11 to 9 since TIME_SLOTS has 9 slots
 
 export type DateAvailability = 'available' | 'limited' | 'full';
 
-/**
- * Fetches booked date/time slots from cleaning_quotes
- * Excludes cancelled quotes so those slots become available again
- */
 export function useBookedSlots() {
   const [bookedSlots, setBookedSlots] = useState<BookedSlot[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Bring in blocked slots logic
+  const { checkIsBlocked, loading: loadingBlocks } = useBlockedSlots();
 
   const fetchBookedSlots = useCallback(async () => {
     setLoading(true);
 
     try {
-      // Get today's date in YYYY-MM-DD format for comparison
       const today = new Date().toISOString().split('T')[0];
 
       const { data, error } = await supabase
         .from('cleaning_quotes')
         .select('preferred_date, preferred_time')
-        .neq('status', 'cancelled') // Exclude cancelled appointments
-        .neq('status', 'completed') // Exclude completed appointments (slot is free again)
-        .gte('preferred_date', today); // Only get future or today's slots
+        .neq('status', 'cancelled')
+        .neq('status', 'completed')
+        .gte('preferred_date', today);
 
       if (error) {
         console.error('Error fetching booked slots:', error);
@@ -41,23 +40,16 @@ export function useBookedSlots() {
         const currentHour = now.getHours();
         const currentMinutes = now.getMinutes();
 
-        // Filter out slots that have already passed today
         const slots: BookedSlot[] = (data || [])
           .filter(row => {
             if (!row.preferred_date || !row.preferred_time) return false;
-
-            // If it's a future date, keep it
             if (row.preferred_date > today) return true;
-
-            // If it's today, check if the time has passed
             if (row.preferred_date === today && row.preferred_time) {
               const [hours, minutes] = row.preferred_time.split(':').map(Number);
-              // Keep slot if it hasn't passed yet
               if (hours > currentHour) return true;
               if (hours === currentHour && minutes > currentMinutes) return true;
-              return false; // Time has passed
+              return false;
             }
-
             return false;
           })
           .map(row => ({
@@ -78,57 +70,44 @@ export function useBookedSlots() {
     fetchBookedSlots();
   }, [fetchBookedSlots]);
 
-  /**
-   * Check if a specific date/time combination is already booked
-   * DISABLED: Always returns false to allow multiple bookings
-   */
-  const isSlotBooked = useCallback((_date: string, _time: string): boolean => {
-    return false; // Blocking disabled - allow multiple bookings
-  }, []);
+  const getBookedTimesForDate = useCallback((date: string): string[] => {
+    // Collect all booked times from quotes
+    // Currently blocked multiple bookings are disabled, so we only return manually blocked times
+    // Wait, the user wants manual blocking. The previous code disabled ALL blocking (returned []).
+    // So we will return ONLY the manually blocked times, OR we can combine them. 
+    // Since the previous code explicitly disabled booking blocking, I will only return manually blocked times.
+    const allSlots = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"];
+    const blockedTimes = allSlots.filter(time => checkIsBlocked(date, time));
+    return blockedTimes;
+  }, [checkIsBlocked]);
 
-  /**
-   * Get all booked times for a specific date
-   * DISABLED: Always returns empty array to allow multiple bookings
-   */
-  const getBookedTimesForDate = useCallback((_date: string): string[] => {
-    return []; // Blocking disabled - allow multiple bookings
-  }, []);
+  const isSlotBooked = useCallback((date: string, time: string): boolean => {
+    return checkIsBlocked(date, time);
+  }, [checkIsBlocked]);
 
-  /**
-   * Get count of booked slots for a date
-   * DISABLED: Always returns 0 to allow multiple bookings
-   */
-  const getBookedCountForDate = useCallback((_date: string): number => {
-    return 0; // Blocking disabled - allow multiple bookings
-  }, []);
+  const getBookedCountForDate = useCallback((date: string): number => {
+    return getBookedTimesForDate(date).length;
+  }, [getBookedTimesForDate]);
 
-  /**
-   * Check if a date has any available slots
-   * DISABLED: Always returns false (never fully booked)
-   */
-  const isDateFullyBooked = useCallback((_date: string): boolean => {
-    return false; // Blocking disabled - allow multiple bookings
-  }, []);
+  const isDateFullyBooked = useCallback((date: string): boolean => {
+    return checkIsBlocked(date) || getBookedTimesForDate(date).length >= TOTAL_DAILY_SLOTS;
+  }, [checkIsBlocked, getBookedTimesForDate]);
 
-  /**
-   * Get availability status for a date
-   * DISABLED: Always returns 'available' to allow multiple bookings
-   */
-  const getDateAvailability = useCallback((_date: string): DateAvailability => {
-    return 'available'; // Blocking disabled - allow multiple bookings
-  }, []);
+  const getDateAvailability = useCallback((date: string): DateAvailability => {
+    if (isDateFullyBooked(date)) return 'full';
+    const blockedCount = getBookedTimesForDate(date).length;
+    if (blockedCount > 0) return 'limited';
+    return 'available';
+  }, [isDateFullyBooked, getBookedTimesForDate]);
 
-  /**
-   * Get available slots count for a date
-   * DISABLED: Always returns full capacity to allow multiple bookings
-   */
-  const getAvailableSlotsCount = useCallback((_date: string): number => {
-    return TOTAL_DAILY_SLOTS; // Blocking disabled - allow multiple bookings
-  }, []);
+  const getAvailableSlotsCount = useCallback((date: string): number => {
+    if (checkIsBlocked(date)) return 0;
+    return TOTAL_DAILY_SLOTS - getBookedTimesForDate(date).length;
+  }, [checkIsBlocked, getBookedTimesForDate]);
 
   return {
     bookedSlots,
-    loading,
+    loading: loading || loadingBlocks,
     isSlotBooked,
     getBookedTimesForDate,
     getBookedCountForDate,

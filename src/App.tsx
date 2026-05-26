@@ -19,6 +19,7 @@ import FormsPage from "./pages/admin/FormsPage";
 import PricingConfigPage from "./pages/admin/PricingConfigPage";
 import SettingsPage from "./pages/admin/SettingsPage";
 import EmailSettingsPage from "./pages/admin/EmailSettingsPage";
+import BlockedDatesPage from "./pages/admin/BlockedDatesPage";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +56,7 @@ const AppRoutes = () => {
         <Route path="pricing" element={<PricingConfigPage />} />
         <Route path="emails" element={<EmailSettingsPage />} />
         <Route path="settings" element={<SettingsPage />} />
+        <Route path="blocked-dates" element={<BlockedDatesPage />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

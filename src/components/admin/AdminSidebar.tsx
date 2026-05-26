@@ -31,6 +31,7 @@ const menuItems = [
   { title: 'Dashboard', url: '/', icon: LayoutDashboard },
   { title: 'Submissions', url: '/submissions', icon: FileText },
   { title: 'Calendar', url: '/calendar', icon: Calendar },
+  { title: 'Blocked Dates', url: '/blocked-dates', icon: Calendar },
   { title: 'Forms', url: '/forms', icon: ClipboardList },
   { title: 'Pricing', url: '/pricing', icon: DollarSign },
 ];
