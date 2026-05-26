@@ -267,6 +267,16 @@ export function HouseCleaningForm() {
 
       setShowSuccessModal(true);
 
+      // Track successful form submission in GA4
+      if (typeof window !== 'undefined' && typeof (window as any).gtag === 'function') {
+        (window as any).gtag('event', 'generate_lead', {
+          event_category: 'Lead',
+          event_label: 'House Cleaning Form Submit',
+          value: calculation.total,
+          currency: 'CAD'
+        });
+      }
+
       // Reset form
       setFormData({
         cleaningType: "standard",
